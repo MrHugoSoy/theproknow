@@ -158,7 +158,7 @@ export default function Landing() {
 
       <div className="w-full px-8 py-6 flex gap-6">
 
-        {/* 🟣 LEFT: CATEGORÍAS */}
+        {/* 🟣 LEFT */}
         <div className="w-56 hidden lg:block">
           <div className="sticky top-24">
             <CategoriesBar
@@ -169,10 +169,11 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* 🔵 CENTER: FEED */}
-        <div className="flex-1">
+        {/* 🔵 CENTER */}
+        <div className="flex-1 max-w-[1600px] mx-auto">
 
-          <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-6 space-y-6">
+          {/* 🔥 MASONRY PRO */}
+          <div className="columns-2 sm:columns-3 md:columns-4 xl:columns-5 gap-6 space-y-6 [column-fill:_balance]">
 
             {filteredPosts.map(post => {
 
@@ -196,7 +197,7 @@ export default function Landing() {
 
         </div>
 
-        {/* 🟡 RIGHT: SIDEBAR */}
+        {/* 🟡 RIGHT */}
         <div className="w-72 hidden lg:block space-y-4">
 
           <StatsCard posts={posts} usersCount={usersCount} />

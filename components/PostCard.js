@@ -27,9 +27,9 @@ export default function PostCard({
         <div onClick={goToPost} className="cursor-pointer">
 
           <img
-            src={post.image_url || "https://picsum.photos/500"}
-            className="w-full object-cover aspect-[4/5] group-hover:scale-105 transition duration-300"
-          />
+  src={post.image_url || "https://picsum.photos/500"}
+  className="w-full h-auto object-cover group-hover:scale-105 transition duration-300"
+/>
 
           {/* OVERLAY SUAVE */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />

@@ -9,10 +9,8 @@ export default function Header() {
   const [user, setUser] = useState(null)
 
   useEffect(() => {
-    // 🔥 Obtener usuario inicial
     getUser()
 
-    // 🔥 ESCUCHAR CAMBIOS DE SESIÓN (CLAVE)
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -32,11 +30,7 @@ export default function Header() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-
-    // 🔥 actualizar UI
     setUser(null)
-
-    // 🔥 redirigir
     router.push("/login")
     router.refresh()
   }
@@ -44,50 +38,53 @@ export default function Header() {
   return (
     <div className="w-full bg-white sticky top-0 z-50 shadow-sm">
 
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      {/* 🔥 HEADER MÁS COMPACTO */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 sm:py-4 flex items-center justify-between gap-3">
 
         {/* LOGO */}
         <div
-          className="flex items-center gap-3 cursor-pointer"
+          className="flex items-center gap-2 sm:gap-3 cursor-pointer"
           onClick={() => router.push("/")}
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold shadow">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold shadow">
             P
           </div>
 
           <div>
-            <h1 className="font-bold text-lg text-gray-900">
+            <h1 className="font-bold text-sm sm:text-lg text-gray-900">
               ThePROknow
             </h1>
-            <p className="text-xs text-blue-500 font-semibold">
+
+            {/* 🔥 OCULTO EN MOBILE */}
+            <p className="hidden sm:block text-xs text-blue-500 font-semibold">
               EXPERTISE HUB
             </p>
           </div>
         </div>
 
-        {/* BUSCADOR */}
-        <div className="flex-1 mx-10">
+        {/* 🔍 BUSCADOR (RESPONSIVE) */}
+        <div className="flex-1 mx-2 sm:mx-10">
           <input
-            placeholder="Buscar consejos..."
-            className="w-full bg-gray-100 px-4 py-2 rounded-full text-sm outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Buscar..."
+            className="w-full bg-gray-100 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         {/* DERECHA */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
 
           {!user ? (
             <>
               <button
                 onClick={() => router.push("/login")}
-                className="text-sm text-gray-600 hover:text-gray-900"
+                className="text-xs sm:text-sm text-gray-600 hover:text-gray-900"
               >
                 Ingresar
               </button>
 
               <button
                 onClick={() => router.push("/register")}
-                className="px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow hover:scale-105 transition"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow hover:scale-105 transition"
               >
                 Unirse
               </button>
@@ -97,7 +94,7 @@ export default function Header() {
               {/* PERFIL */}
               <div
                 onClick={() => router.push(`/profile/${user.id}`)}
-                className="w-9 h-9 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold cursor-pointer hover:scale-105 transition"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs sm:text-sm font-bold cursor-pointer hover:scale-105 transition"
               >
                 {user.email?.charAt(0).toUpperCase()}
               </div>
@@ -105,7 +102,7 @@ export default function Header() {
               {/* LOGOUT */}
               <button
                 onClick={handleLogout}
-                className="text-xs text-gray-500 hover:text-red-500"
+                className="text-[10px] sm:text-xs text-gray-500 hover:text-red-500"
               >
                 Salir
               </button>

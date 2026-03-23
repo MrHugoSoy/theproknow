@@ -156,7 +156,7 @@ export default function Landing() {
   return (
     <main className="min-h-screen">
 
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex gap-4 lg:gap-6">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-6 flex gap-4 lg:gap-6">
 
         {/* 🟣 LEFT */}
         <div className="w-56 hidden lg:block">

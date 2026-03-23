@@ -37,7 +37,7 @@ export default function PostCard({
           {/* CATEGORY FLOAT (MEJORADO) */}
           {post.category && (
             <div className="absolute top-3 left-3">
-              <span className="bg-white/95 px-3 py-1 rounded-full text-xs font-semibold shadow-sm">
+              <span className="bg-white/95 px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold shadow-sm">
                 {post.category}
               </span>
             </div>
@@ -123,7 +123,7 @@ export default function PostCard({
         <div className="border-t border-gray-100 pt-3 flex items-center justify-between">
 
           {/* USER */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 px-2 py-1">
 
             <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold">
               {post.name?.charAt(0)?.toUpperCase()}

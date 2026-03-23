@@ -156,7 +156,7 @@ export default function Landing() {
   return (
     <main className="min-h-screen">
 
-      <div className="w-full px-8 py-6 flex gap-6">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex gap-4 lg:gap-6">
 
         {/* 🟣 LEFT */}
         <div className="w-56 hidden lg:block">
@@ -172,8 +172,8 @@ export default function Landing() {
         {/* 🔵 CENTER */}
         <div className="flex-1 max-w-[1600px] mx-auto">
 
-          {/* 🔥 MASONRY PRO */}
-          <div className="columns-2 sm:columns-3 md:columns-4 xl:columns-5 gap-6 space-y-6 [column-fill:_balance]">
+          {/* 🔥 MASONRY RESPONSIVE PRO */}
+          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-6 space-y-6 [column-fill:_balance]">
 
             {filteredPosts.map(post => {
 

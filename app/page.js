@@ -4,11 +4,13 @@ import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 import { getUser } from "@/lib/auth"
 
+import { sortPosts, getTrendingScore } from "@/lib/algorithm"
+
 import CategoriesBar from "@/components/CategoriesBar"
-import PostCard from "@/components/PostCard"
 import StatsCard from "@/components/StatsCard"
 import TrendingCard from "@/components/TrendingCard"
 import AdCard from "@/components/AdCard"
+import Feed from "@/components/Feed"
 
 export default function Landing() {
   const router = useRouter()
@@ -20,10 +22,16 @@ export default function Landing() {
   const [usersCount, setUsersCount] = useState(0)
 
   const [category, setCategory] = useState("all")
-  const [sort, setSort] = useState("recent")
+  const [sort, setSort] = useState("trending")
+  const [loading, setLoading] = useState(true)
+
+  // 🔥 NUEVO
+  const [page, setPage] = useState(0)
+  const [hasMore, setHasMore] = useState(true)
+  const LIMIT = 10
 
   useEffect(() => {
-    getPosts()
+    getPosts(0, true)
     getUsersCount()
     checkUser()
   }, [])
@@ -47,17 +55,30 @@ export default function Landing() {
     return data || []
   }
 
-  const getPosts = async () => {
+  // 🔥 NUEVO getPosts con paginación
+  const getPosts = async (pageNumber = 0, reset = false) => {
+    if (!hasMore && !reset) return
+
+    setLoading(true)
+
+    const from = pageNumber * LIMIT
+    const to = from + LIMIT - 1
+
     const { data } = await supabase
       .from("posts")
       .select("*")
       .order("created_at", { ascending: false })
+      .range(from, to)
 
-    if (!data) return setPosts([])
+    if (!data || data.length === 0) {
+      setHasMore(false)
+      setLoading(false)
+      return
+    }
 
     const profiles = await getProfiles()
 
-    const postsWithData = await Promise.all(
+    const newPosts = await Promise.all(
       data.map(async (post) => {
         const userProfile = profiles.find(p => p.id === post.user_id)
 
@@ -82,7 +103,9 @@ export default function Landing() {
       })
     )
 
-    setPosts(postsWithData)
+    setPosts(prev => reset ? newPosts : [...prev, ...newPosts])
+    setPage(pageNumber)
+    setLoading(false)
   }
 
   const getLikes = async (userId) => {
@@ -124,11 +147,27 @@ export default function Landing() {
     }
 
     await getLikes(user.id)
-    await getPosts()
+    await getPosts(0, true)
   }
 
-  const filteredPosts = posts
-    .filter(post => {
+  // 🔥 SCROLL INFINITO
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 300
+      ) {
+        getPosts(page + 1)
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [page, hasMore])
+
+  // 🔥 FILTRO + ALGORITMO
+  const filteredPosts = sortPosts(
+    posts.filter(post => {
       const matchesSearch =
         post.title?.toLowerCase().includes(search.toLowerCase()) ||
         post.content?.toLowerCase().includes(search.toLowerCase())
@@ -137,28 +176,20 @@ export default function Landing() {
         category === "all" || post.category === category
 
       return matchesSearch && matchesCategory
-    })
-    .sort((a, b) => {
-      if (sort === "popular") {
-        return (b.likes_count || 0) - (a.likes_count || 0)
-      }
-      return new Date(b.created_at) - new Date(a.created_at)
-    })
+    }),
+    sort
+  )
 
   const trendingPosts = [...posts]
-    .sort((a, b) => {
-      const scoreA = (a.likes_count || 0) - (a.dislikes_count || 0)
-      const scoreB = (b.likes_count || 0) - (b.dislikes_count || 0)
-      return scoreB - scoreA
-    })
+    .sort((a, b) => getTrendingScore(b) - getTrendingScore(a))
     .slice(0, 3)
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-gray-50">
 
       <div className="w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-6 flex gap-4 lg:gap-6">
 
-        {/* 🟣 LEFT */}
+        {/* LEFT */}
         <div className="w-56 hidden lg:block">
           <div className="sticky top-24">
             <CategoriesBar
@@ -169,35 +200,43 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* 🔵 CENTER */}
+        {/* CENTER */}
         <div className="flex-1 max-w-[1600px] mx-auto">
 
-          {/* 🔥 MASONRY RESPONSIVE PRO */}
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-6 space-y-6 [column-fill:_balance]">
+          {/* MENU */}
+          <div className="sticky top-[65px] z-40 mb-4">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar px-1">
 
-            {filteredPosts.map(post => {
+              <button onClick={() => setSort("trending")}
+                className={`px-4 py-2 rounded-full text-xs ${sort==="trending"?"bg-black text-white":"bg-gray-200"}`}>
+                🔥 Trending
+              </button>
 
-              const reaction = likes.find(
-                (l) => l.post_id === post.id
-              )?.reaction_type
+              <button onClick={() => setSort("popular")}
+                className={`px-4 py-2 rounded-full text-xs ${sort==="popular"?"bg-black text-white":"bg-gray-200"}`}>
+                👍 Popular
+              </button>
 
-              return (
-                <div key={post.id} className="break-inside-avoid">
-                  <PostCard
-                    post={post}
-                    user={user}
-                    reaction={reaction}
-                    toggleReaction={toggleReaction}
-                  />
-                </div>
-              )
-            })}
+              <button onClick={() => setSort("new")}
+                className={`px-4 py-2 rounded-full text-xs ${sort==="new"?"bg-black text-white":"bg-gray-200"}`}>
+                🆕 Nuevo
+              </button>
 
+            </div>
           </div>
+
+          {/* FEED */}
+          <Feed
+            posts={filteredPosts}
+            loading={loading}
+            likes={likes}
+            user={user}
+            toggleReaction={toggleReaction}
+          />
 
         </div>
 
-        {/* 🟡 RIGHT */}
+        {/* RIGHT */}
         <div className="w-72 hidden lg:block space-y-4">
 
           <StatsCard posts={posts} usersCount={usersCount} />

@@ -19,7 +19,10 @@ export default function PostCard({
   }
 
   return (
-    <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition break-inside-avoid border border-gray-100">
+    <div
+      className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition break-inside-avoid border border-gray-100"
+      style={{ breakInside: "avoid" }} // 🔥 FIX TABLET
+    >
 
       {/* IMAGE */}
       <div className="relative overflow-hidden">
@@ -37,7 +40,7 @@ export default function PostCard({
 
           {/* CATEGORY */}
           {post.category && (
-            <div className="absolute top-3 left-3">
+            <div className="absolute top-3 left-3 z-10">
               <span className="bg-white/95 px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold shadow-sm">
                 {post.category}
               </span>
@@ -45,8 +48,7 @@ export default function PostCard({
           )}
 
           {/* ACTION BAR */}
-          <div className="absolute bottom-3 left-3 right-3">
-
+          <div className="absolute bottom-3 left-3 right-3 z-10">
             <div className="bg-black/70 backdrop-blur-md rounded-xl px-3 py-2 flex justify-between items-center">
 
               <div className="flex gap-4 text-white text-xs sm:text-sm">
@@ -87,7 +89,6 @@ export default function PostCard({
               )}
 
             </div>
-
           </div>
 
         </div>
@@ -99,7 +100,7 @@ export default function PostCard({
               e.stopPropagation()
               onDelete(post.id)
             }}
-            className="absolute top-3 right-3 z-50 bg-white/90 backdrop-blur text-red-500 px-2 py-1 rounded-md text-xs shadow hover:bg-red-500 hover:text-white transition"
+            className="absolute top-3 right-3 z-20 bg-white/90 backdrop-blur text-red-500 px-2 py-1 rounded-md text-xs shadow hover:bg-red-500 hover:text-white transition"
           >
             ✕
           </button>

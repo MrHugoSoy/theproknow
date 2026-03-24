@@ -1,5 +1,6 @@
 "use client"
-import { useEffect, useState } from "react"
+
+import { useEffect, useState, useRef } from "react" // 👈 agregamos useRef
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 import { getUser } from "@/lib/auth"
@@ -25,10 +26,11 @@ export default function Landing() {
   const [sort, setSort] = useState("trending")
   const [loading, setLoading] = useState(true)
 
-  // 🔥 NUEVO
   const [page, setPage] = useState(0)
   const [hasMore, setHasMore] = useState(true)
   const LIMIT = 10
+
+  const loadMoreRef = useRef(null) // 🔥 NUEVO
 
   useEffect(() => {
     getPosts(0, true)
@@ -55,7 +57,6 @@ export default function Landing() {
     return data || []
   }
 
-  // 🔥 NUEVO getPosts con paginación
   const getPosts = async (pageNumber = 0, reset = false) => {
     if (!hasMore && !reset) return
 
@@ -150,22 +151,24 @@ export default function Landing() {
     await getPosts(0, true)
   }
 
-  // 🔥 SCROLL INFINITO
+  // 🔥 NUEVO: INTERSECTION OBSERVER (lazy load PRO)
   useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + window.scrollY >=
-        document.body.offsetHeight - 300
-      ) {
-        getPosts(page + 1)
-      }
-    }
+    if (!loadMoreRef.current || !hasMore) return
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [page, hasMore])
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading) {
+          getPosts(page + 1)
+        }
+      },
+      { threshold: 1 }
+    )
 
-  // 🔥 FILTRO + ALGORITMO
+    observer.observe(loadMoreRef.current)
+
+    return () => observer.disconnect()
+  }, [page, hasMore, loading])
+
   const filteredPosts = sortPosts(
     posts.filter(post => {
       const matchesSearch =
@@ -233,6 +236,9 @@ export default function Landing() {
             user={user}
             toggleReaction={toggleReaction}
           />
+
+          {/* 🔥 TRIGGER DE CARGA */}
+          <div ref={loadMoreRef} className="h-10"></div>
 
         </div>
 

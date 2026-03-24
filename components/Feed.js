@@ -1,6 +1,7 @@
 "use client"
 
 import PostCard from "./PostCard"
+import FadeIn from "./FadeIn"
 
 export default function Feed({
   posts,
@@ -31,14 +32,20 @@ export default function Feed({
             )?.reaction_type
 
             return (
-              <div key={post.id} className="break-inside-avoid">
-                <PostCard
-                  post={post}
-                  user={user}
-                  reaction={reaction}
-                  toggleReaction={toggleReaction}
-                />
-              </div>
+              <div
+  key={post.id}
+  className="break-inside-avoid mb-6"
+  style={{ breakInside: "avoid" }}
+>
+  <FadeIn>
+    <PostCard
+      post={post}
+      user={user}
+      reaction={reaction}
+      toggleReaction={toggleReaction}
+    />
+  </FadeIn>
+</div>
             )
           })}
 

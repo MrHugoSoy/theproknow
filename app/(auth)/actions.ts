@@ -37,7 +37,15 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
 
   const supabase = await createClient();
 
-  const { data: taken } = await supabase.from("profiles").select("id").eq("username", username).maybeSingle();
+  const { data: taken, error: lookupError } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("username", username)
+    .maybeSingle();
+  if (lookupError) {
+    console.error("signUp: no se pudo comprobar el nombre de usuario", lookupError);
+    return { message: "No pudimos crear tu cuenta en este momento. Inténtalo de nuevo." };
+  }
   if (taken) return { errors: { username: ["Ese nombre de usuario ya está en uso"] } };
 
   const { data, error } = await supabase.auth.signUp({

@@ -5,11 +5,12 @@ import { Avatar } from "@/components/ui/Avatar";
 import { buttonStyles } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { getLevel } from "@/lib/reputation";
+import type { Viewer } from "@/lib/data/viewer";
 import type { AuthorSummary } from "@/lib/types";
 import { formatNumber } from "@/lib/utils";
 
 export type SidebarRightProps = {
-  me: AuthorSummary & { posts: number; followers: number; following: number };
+  me: Pick<Viewer, "username" | "displayName" | "avatarUrl" | "reputation" | "posts" | "followers" | "following"> | null;
   experts: (AuthorSummary & { area: string })[];
   trends: { topic: string; posts: string }[];
 };
@@ -41,7 +42,22 @@ function QuoteCard() {
   );
 }
 
-function ProfileCard({ me }: { me: SidebarRightProps["me"] }) {
+function JoinCard() {
+  return (
+    <Card className="p-5 text-center">
+      <h2 className="text-[15px] font-bold text-ink">Únete a TheProKnow</h2>
+      <p className="mt-1 text-sm text-muted">Sigue a expertos, guarda consejos y comparte lo que sabes.</p>
+      <Link href="/registro" className={buttonStyles("primary", "md", "mt-4 w-full")}>
+        Crear cuenta
+      </Link>
+      <Link href="/login" className="mt-2 block text-[13px] font-medium text-brand hover:underline">
+        Ya tengo cuenta
+      </Link>
+    </Card>
+  );
+}
+
+function ProfileCard({ me }: { me: NonNullable<SidebarRightProps["me"]> }) {
   const lvl = getLevel(me.reputation);
   const stats = [
     { label: "Consejos", value: me.posts },
@@ -195,7 +211,7 @@ export function SidebarRight({ me, experts, trends }: SidebarRightProps) {
   return (
     <aside aria-label="Complementario" className="hidden w-[340px] shrink-0 space-y-4 py-5 pr-4 xl:block">
       <QuoteCard />
-      <ProfileCard me={me} />
+      {me ? <ProfileCard me={me} /> : <JoinCard />}
       <TopExperts experts={experts} />
       <Trends trends={trends} />
       <PublishCta />

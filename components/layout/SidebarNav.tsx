@@ -10,7 +10,7 @@ export function SidebarNav({
   username,
   unreadNotifications,
 }: {
-  username: string;
+  username: string | null;
   unreadNotifications: number;
 }) {
   const pathname = usePathname();

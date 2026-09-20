@@ -4,22 +4,37 @@ import { Composer } from "@/components/feed/Composer";
 import { FeedTabs, parseTab } from "@/components/feed/FeedTabs";
 import { PostCard } from "@/components/feed/PostCard";
 import { buttonStyles } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { getMockPosts, MOCK_ME } from "@/lib/mock";
+import { getViewer } from "@/lib/data/viewer";
+import { getMockPosts } from "@/lib/mock";
 
 export default async function HomePage({
   searchParams,
 }: {
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const tab = parseTab((await searchParams).tab);
+  const [{ tab: rawTab }, viewer] = await Promise.all([searchParams, getViewer()]);
+  const tab = parseTab(rawTab);
   const posts = getMockPosts();
-  // Fase 1: datos mock. "Siguiendo" muestra el estado vacío para validar el copy.
+  // Los posts siguen siendo mock hasta la Fase 3. "Siguiendo" muestra el estado vacío.
   const visible = tab === "siguiendo" ? [] : tab === "tendencias" ? [...posts].reverse() : posts;
 
   return (
     <div className="space-y-4">
-      <Composer displayName={MOCK_ME.displayName} avatarUrl={MOCK_ME.avatarUrl} />
+      {viewer ? (
+        <Composer displayName={viewer.displayName} avatarUrl={viewer.avatarUrl} />
+      ) : (
+        <Card className="flex flex-col items-start gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-bold text-ink">Aprende de quienes saben</h2>
+            <p className="text-sm text-muted">Crea una cuenta para publicar, guardar y seguir a expertos.</p>
+          </div>
+          <Link href="/registro" className={buttonStyles("primary")}>
+            Crear cuenta
+          </Link>
+        </Card>
+      )}
       <FeedTabs active={tab} />
       <h1 className="sr-only">Inicio</h1>
       {visible.length === 0 ? (

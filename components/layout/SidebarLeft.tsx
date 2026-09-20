@@ -6,7 +6,7 @@ import type { CommunitySummary } from "@/lib/types";
 import { SidebarNav } from "./SidebarNav";
 
 type Props = {
-  username: string;
+  username: string | null;
   unreadNotifications: number;
   communities: CommunitySummary[];
 };

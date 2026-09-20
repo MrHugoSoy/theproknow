@@ -1,18 +1,12 @@
 import Link from "next/link";
-import { Bell, ChevronDown, MessageSquare, Plus, Search } from "lucide-react";
-import { Avatar } from "@/components/ui/Avatar";
+import { Bell, MessageSquare, Plus, Search } from "lucide-react";
 import { CountBadge } from "@/components/ui/Badge";
 import { buttonStyles } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
+import type { Viewer } from "@/lib/data/viewer";
+import { AccountMenu } from "./AccountMenu";
 
-type Props = {
-  displayName: string;
-  avatarUrl: string | null;
-  unreadNotifications: number;
-};
-
-export function Navbar({ displayName, avatarUrl, unreadNotifications }: Props) {
-  const firstName = displayName.split(" ")[0]!;
+export function Navbar({ viewer }: { viewer: Viewer | null }) {
   const iconBtn =
     "relative flex size-10 items-center justify-center rounded-full text-white/90 hover:bg-white/10";
 
@@ -44,37 +38,51 @@ export function Navbar({ displayName, avatarUrl, unreadNotifications }: Props) {
           <Link href="/buscar" aria-label="Buscar" className={`${iconBtn} md:hidden`}>
             <Search className="size-5" aria-hidden />
           </Link>
-          <Link
-            href="/notificaciones"
-            aria-label={
-              unreadNotifications > 0
-                ? `Notificaciones, ${unreadNotifications} sin leer`
-                : "Notificaciones"
-            }
-            className={iconBtn}
-          >
-            <Bell className="size-5" aria-hidden />
-            <CountBadge
-              count={unreadNotifications}
-              className="pointer-events-none absolute right-0.5 top-0.5 !min-w-4 !px-1 text-[10px] !leading-4"
-            />
-          </Link>
-          <Link href="/mensajes" aria-label="Mensajes" className={`${iconBtn} hidden sm:flex`}>
-            <MessageSquare className="size-5" aria-hidden />
-          </Link>
-          <Link
-            href="/ajustes"
-            aria-label="Menú de cuenta"
-            className="hidden items-center gap-2 rounded-full py-1 pl-1 pr-2 hover:bg-white/10 sm:flex"
-          >
-            <Avatar name={displayName} src={avatarUrl} size="sm" />
-            <span className="text-sm font-medium">{firstName}</span>
-            <ChevronDown className="size-4 text-slate-300" aria-hidden />
-          </Link>
-          <Link href="/publicar" aria-label="Publicar" className={buttonStyles("primary", "md", "ml-1 max-sm:w-10 max-sm:px-0")}>
-            <Plus className="size-4" aria-hidden />
-            <span className="hidden sm:inline">Publicar</span>
-          </Link>
+
+          {viewer ? (
+            <>
+              <Link
+                href="/notificaciones"
+                aria-label={
+                  viewer.unreadNotifications > 0
+                    ? `Notificaciones, ${viewer.unreadNotifications} sin leer`
+                    : "Notificaciones"
+                }
+                className={iconBtn}
+              >
+                <Bell className="size-5" aria-hidden />
+                <CountBadge
+                  count={viewer.unreadNotifications}
+                  className="pointer-events-none absolute right-0.5 top-0.5 !min-w-4 !px-1 text-[10px] !leading-4"
+                />
+              </Link>
+              <Link href="/mensajes" aria-label="Mensajes" className={`${iconBtn} hidden sm:flex`}>
+                <MessageSquare className="size-5" aria-hidden />
+              </Link>
+              <AccountMenu
+                displayName={viewer.displayName}
+                username={viewer.username}
+                avatarUrl={viewer.avatarUrl}
+              />
+              <Link
+                href="/publicar"
+                aria-label="Publicar"
+                className={buttonStyles("primary", "md", "ml-1 max-sm:w-10 max-sm:px-0")}
+              >
+                <Plus className="size-4" aria-hidden />
+                <span className="hidden sm:inline">Publicar</span>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="hidden h-10 items-center rounded-lg px-3 text-sm font-medium hover:bg-white/10 sm:inline-flex">
+                Iniciar sesión
+              </Link>
+              <Link href="/registro" className={buttonStyles("primary", "md")}>
+                Crear cuenta
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

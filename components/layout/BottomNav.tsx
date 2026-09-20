@@ -12,7 +12,7 @@ export function BottomNav({
   username,
   unreadNotifications,
 }: {
-  username: string;
+  username: string | null;
   unreadNotifications: number;
 }) {
   const pathname = usePathname();

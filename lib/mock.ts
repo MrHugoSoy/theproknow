@@ -24,13 +24,14 @@ export const MOCK_ME = {
 
 export const MOCK_UNREAD_NOTIFICATIONS = 3;
 
+// En modo demo el id es el slug (no es un UUID: no se puede publicar sin Supabase).
 export const MOCK_COMMUNITIES: CommunitySummary[] = [
-  { slug: "diseno-grafico", name: "Diseño Gráfico", icon: "palette", isActive: true },
-  { slug: "fotografia", name: "Fotografía", icon: "camera", isActive: true },
-  { slug: "inteligencia-artificial", name: "Inteligencia Artificial", icon: "bot", isActive: false },
-  { slug: "negocios", name: "Negocios", icon: "briefcase", isActive: false },
-  { slug: "carpinteria", name: "Carpintería", icon: "hammer", isActive: false },
-  { slug: "productividad", name: "Productividad", icon: "zap", isActive: false },
+  { id: "diseno-grafico", slug: "diseno-grafico", name: "Diseño Gráfico", icon: "palette", isActive: true },
+  { id: "fotografia", slug: "fotografia", name: "Fotografía", icon: "camera", isActive: true },
+  { id: "inteligencia-artificial", slug: "inteligencia-artificial", name: "Inteligencia Artificial", icon: "bot", isActive: false },
+  { id: "negocios", slug: "negocios", name: "Negocios", icon: "briefcase", isActive: false },
+  { id: "carpinteria", slug: "carpinteria", name: "Carpintería", icon: "hammer", isActive: false },
+  { id: "productividad", slug: "productividad", name: "Productividad", icon: "zap", isActive: false },
 ];
 
 const c = (slug: string) => MOCK_COMMUNITIES.find((x) => x.slug === slug)!;
@@ -44,11 +45,11 @@ export const MOCK_EXPERTS = [
 ];
 
 export const MOCK_TRENDS = [
-  { topic: "Herramientas de IA en 2025", posts: "2,4k" },
-  { topic: "Fotografía de producto", posts: "1,8k" },
-  { topic: "Diseño de portafolios", posts: "1,2k" },
-  { topic: "Consejos para emprender", posts: "980" },
-  { topic: "Organización personal", posts: "870" },
+  { tag: "ia", posts: 2400 },
+  { tag: "fotografiadeproducto", posts: 1800 },
+  { tag: "portafolio", posts: 1200 },
+  { tag: "emprender", posts: 980 },
+  { tag: "productividad", posts: 870 },
 ];
 
 const ago = (hours: number) => new Date(Date.now() - hours * 3_600_000).toISOString();
@@ -101,7 +102,10 @@ export function getMockPosts(): PostCardData[] {
       commentCount: 128,
       saveCount: 30,
       helpfulCount: 0,
-      answerAuthors: [MOCK_EXPERTS[2]!, MOCK_EXPERTS[3]!, MOCK_EXPERTS[0]!],
+      answerAuthors: [MOCK_EXPERTS[2]!, MOCK_EXPERTS[3]!, MOCK_EXPERTS[0]!].map((a) => ({
+        displayName: a.displayName,
+        avatarUrl: a.avatarUrl,
+      })),
     },
     {
       id: "4",

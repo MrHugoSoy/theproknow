@@ -2,11 +2,16 @@ import { BottomNav } from "@/components/layout/BottomNav";
 import { Navbar } from "@/components/layout/Navbar";
 import { SidebarLeft } from "@/components/layout/SidebarLeft";
 import { SidebarRight } from "@/components/layout/SidebarRight";
+import { getTopExperts, getTrendingTags } from "@/lib/data/sidebar";
 import { getCommunities, getViewer } from "@/lib/data/viewer";
-import { MOCK_EXPERTS, MOCK_TRENDS } from "@/lib/mock";
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
-  const [viewer, communities] = await Promise.all([getViewer(), getCommunities()]);
+  const viewer = await getViewer();
+  const [communities, experts, trends] = await Promise.all([
+    getCommunities(),
+    getTopExperts(viewer?.id ?? null),
+    getTrendingTags(),
+  ]);
   const username = viewer?.username ?? null;
   const unread = viewer?.unreadNotifications ?? 0;
 
@@ -24,8 +29,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
         <main id="contenido" className="min-w-0 max-w-[680px] flex-1 px-3 pb-24 pt-5 md:px-4 md:pb-8">
           {children}
         </main>
-        {/* Expertos y tendencias siguen con datos mock hasta las fases 3 y 5 */}
-        <SidebarRight me={viewer} experts={MOCK_EXPERTS} trends={MOCK_TRENDS} />
+        <SidebarRight me={viewer} experts={experts} trends={trends} />
       </div>
       <BottomNav username={username} unreadNotifications={unread} />
     </>

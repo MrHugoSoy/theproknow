@@ -64,8 +64,8 @@ export const getCommunities = cache(async (): Promise<CommunitySummary[]> => {
   const supabase = await createClient();
   const { data } = await supabase
     .from("communities")
-    .select("slug, name, icon, is_active")
+    .select("id, slug, name, icon, is_active")
     .order("is_active", { ascending: false })
     .order("name");
-  return (data ?? []).map((c) => ({ slug: c.slug, name: c.name, icon: c.icon, isActive: c.is_active }));
+  return (data ?? []).map((c) => ({ id: c.id, slug: c.slug, name: c.name, icon: c.icon, isActive: c.is_active }));
 });

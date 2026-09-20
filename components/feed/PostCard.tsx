@@ -39,7 +39,16 @@ function Thumbnail({ post }: { post: PostCardData }) {
   );
 }
 
-export function PostCard({ post, showFollow = true }: { post: PostCardData; showFollow?: boolean }) {
+export function PostCard({
+  post,
+  viewerId,
+  showFollow = true,
+}: {
+  post: PostCardData;
+  /** id del usuario actual: oculta "Seguir" en sus propias publicaciones */
+  viewerId?: string;
+  showFollow?: boolean;
+}) {
   const { author, community } = post;
   const isQuestion = post.type === "pregunta";
 
@@ -56,7 +65,7 @@ export function PostCard({ post, showFollow = true }: { post: PostCardData; show
             </Link>
             {author.isVerified ? <VerifiedCheck /> : null}
           </p>
-          <p className="truncate text-[13px] text-muted">
+          <p className="truncate text-[13px] text-muted" suppressHydrationWarning>
             @{author.username} · {timeAgo(post.createdAt)}
             {community ? (
               <>
@@ -69,7 +78,7 @@ export function PostCard({ post, showFollow = true }: { post: PostCardData; show
             ) : null}
           </p>
         </div>
-        {showFollow && !post.viewer?.following ? (
+        {showFollow && author.id !== viewerId && !post.viewer?.following ? (
           <FollowButton username={author.username} />
         ) : null}
         <button
@@ -114,7 +123,7 @@ export function PostCard({ post, showFollow = true }: { post: PostCardData; show
           href={`/p/${post.id}#comentarios`}
           className="mt-2 flex w-fit items-center gap-2 rounded-lg py-1 pr-2 text-sm text-muted hover:text-ink"
         >
-          <AvatarStack names={post.answerAuthors.map((a) => a.displayName)} />
+          <AvatarStack people={post.answerAuthors.map((a) => ({ name: a.displayName, src: a.avatarUrl }))} />
           Ver {post.commentCount} respuestas
         </Link>
       ) : null}

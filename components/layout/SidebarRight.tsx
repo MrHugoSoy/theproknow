@@ -5,14 +5,14 @@ import { Avatar } from "@/components/ui/Avatar";
 import { buttonStyles } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { getLevel } from "@/lib/reputation";
+import type { Expert, Trend } from "@/lib/data/sidebar";
 import type { Viewer } from "@/lib/data/viewer";
-import type { AuthorSummary } from "@/lib/types";
 import { formatNumber } from "@/lib/utils";
 
 export type SidebarRightProps = {
   me: Pick<Viewer, "username" | "displayName" | "avatarUrl" | "reputation" | "posts" | "followers" | "following"> | null;
-  experts: (AuthorSummary & { area: string })[];
-  trends: { topic: string; posts: string }[];
+  experts: Expert[];
+  trends: Trend[];
 };
 
 function SectionHeader({ title, href }: { title: string; href: string }) {
@@ -115,6 +115,9 @@ function TopExperts({ experts }: { experts: SidebarRightProps["experts"] }) {
   return (
     <Card className="p-5">
       <SectionHeader title="Expertos destacados" href="/explorar" />
+      {experts.length === 0 ? (
+        <p className="mt-3 text-sm text-muted">Aún no hay expertos destacados.</p>
+      ) : null}
       <ul className="mt-3 space-y-3">
         {experts.map((e) => (
           <li key={e.username} className="flex items-center gap-3">
@@ -129,7 +132,7 @@ function TopExperts({ experts }: { experts: SidebarRightProps["experts"] }) {
                 {formatNumber(e.reputation)} puntos
               </p>
             </div>
-            <FollowButton username={e.username} variant="solid" />
+            <FollowButton username={e.username} initialFollowing={e.following} variant="solid" />
           </li>
         ))}
       </ul>
@@ -141,24 +144,32 @@ function Trends({ trends }: { trends: SidebarRightProps["trends"] }) {
   return (
     <Card className="p-5">
       <SectionHeader title="Tendencias" href="/explorar" />
-      <ol className="mt-3 space-y-3">
-        {trends.map((t, i) => (
-          <li key={t.topic}>
-            <Link
-              href={`/buscar?q=${encodeURIComponent(t.topic)}`}
-              className="flex items-center gap-3 rounded-lg hover:bg-surface"
-            >
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-navy text-[13px] font-bold text-white">
-                {i + 1}
-              </span>
-              <span className="min-w-0">
-                <span className="block truncate text-sm font-semibold text-ink">{t.topic}</span>
-                <span className="block text-xs text-muted">{t.posts} publicaciones</span>
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ol>
+      {trends.length === 0 ? (
+        <p className="mt-3 text-sm text-muted">
+          Aún no hay etiquetas en tendencia. Añade #etiquetas a tus publicaciones para que aparezcan aquí.
+        </p>
+      ) : (
+        <ol className="mt-3 space-y-3">
+          {trends.map((t, i) => (
+            <li key={t.tag}>
+              <Link
+                href={`/buscar?q=${encodeURIComponent(`#${t.tag}`)}`}
+                className="flex items-center gap-3 rounded-lg hover:bg-surface"
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-navy text-[13px] font-bold text-white">
+                  {i + 1}
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-semibold text-ink">#{t.tag}</span>
+                  <span className="block text-xs text-muted">
+                    {formatNumber(t.posts)} {t.posts === 1 ? "publicación" : "publicaciones"}
+                  </span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      )}
     </Card>
   );
 }

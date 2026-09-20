@@ -53,11 +53,11 @@ export function Avatar({ name, src, size = "md", className, ring }: Props) {
   );
 }
 
-export function AvatarStack({ names }: { names: string[] }) {
+export function AvatarStack({ people }: { people: { name: string; src?: string | null }[] }) {
   return (
     <span className="flex -space-x-2">
-      {names.map((n) => (
-        <Avatar key={n} name={n} size="xs" ring />
+      {people.map((p) => (
+        <Avatar key={p.name} name={p.name} src={p.src} size="xs" ring />
       ))}
     </span>
   );

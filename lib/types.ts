@@ -17,6 +17,7 @@ export type AuthorSummary = {
 };
 
 export type CommunitySummary = {
+  id: string;
   slug: string;
   name: string;
   /** nombre de ícono lucide (ver components/ui/CommunityIcon) */
@@ -39,6 +40,6 @@ export type PostCardData = {
   commentCount: number;
   saveCount: number;
   helpfulCount: number;
-  answerAuthors?: AuthorSummary[];
+  answerAuthors?: { displayName: string; avatarUrl: string | null }[];
   viewer?: { liked: boolean; helpful: boolean; saved: boolean; following: boolean };
 };

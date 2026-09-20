@@ -241,6 +241,12 @@ export type Database = {
     };
     Functions: {
       add_reputation: { Args: { delta: number; uid: string }; Returns: undefined };
+      feed_nuevos: { Args: FeedArgs; Returns: Database["public"]["CompositeTypes"]["feed_row"][] };
+      feed_para_ti: { Args: FeedArgs; Returns: Database["public"]["CompositeTypes"]["feed_row"][] };
+      feed_siguiendo: { Args: FeedArgs; Returns: Database["public"]["CompositeTypes"]["feed_row"][] };
+      feed_tendencias: { Args: FeedArgs; Returns: Database["public"]["CompositeTypes"]["feed_row"][] };
+      feed_page: { Args: FeedArgs & { p_mode: string }; Returns: Database["public"]["CompositeTypes"]["feed_row"][] };
+      trending_tags: { Args: { p_limit?: number; p_days?: number }; Returns: { tag: string; posts: number }[] };
       reputation_level: {
         Args: { points: number };
         Returns: { level: number; name: string; next_level_at: number; progress: number }[];
@@ -252,9 +258,46 @@ export type Database = {
       post_type: "consejo" | "pregunta" | "tutorial" | "articulo";
     };
     CompositeTypes: {
-      [_ in never]: never;
+      feed_row: {
+        id: string | null;
+        author_id: string | null;
+        community_id: string | null;
+        type: Database["public"]["Enums"]["post_type"] | null;
+        title: string | null;
+        body_preview: string | null;
+        cover_url: string | null;
+        video_url: string | null;
+        like_count: number | null;
+        helpful_count: number | null;
+        comment_count: number | null;
+        save_count: number | null;
+        created_at: string | null;
+        score: number | null;
+        author_username: string | null;
+        author_display_name: string | null;
+        author_avatar_url: string | null;
+        author_is_verified: boolean | null;
+        author_reputation: number | null;
+        community_slug: string | null;
+        community_name: string | null;
+        community_icon: string | null;
+        community_is_active: boolean | null;
+        viewer_liked: boolean | null;
+        viewer_helpful: boolean | null;
+        viewer_saved: boolean | null;
+        viewer_following: boolean | null;
+        answerers: Json | null;
+      };
     };
   };
+};
+
+type FeedArgs = {
+  p_limit?: number;
+  p_cursor_score?: number;
+  p_cursor_id?: string;
+  p_community_slug?: string;
+  p_author_username?: string;
 };
 
 type PublicSchema = Database["public"];

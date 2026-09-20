@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { Users } from "lucide-react";
+import { Lightbulb, LogIn, Users } from "lucide-react";
 import { Composer } from "@/components/feed/Composer";
+import { FeedList } from "@/components/feed/FeedList";
 import { FeedTabs, parseTab } from "@/components/feed/FeedTabs";
-import { PostCard } from "@/components/feed/PostCard";
 import { buttonStyles } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { fetchFeed } from "@/lib/data/feed";
 import { getViewer } from "@/lib/data/viewer";
-import { getMockPosts } from "@/lib/mock";
 
 export default async function HomePage({
   searchParams,
@@ -16,9 +16,7 @@ export default async function HomePage({
 }) {
   const [{ tab: rawTab }, viewer] = await Promise.all([searchParams, getViewer()]);
   const tab = parseTab(rawTab);
-  const posts = getMockPosts();
-  // Los posts siguen siendo mock hasta la Fase 3. "Siguiendo" muestra el estado vacío.
-  const visible = tab === "siguiendo" ? [] : tab === "tendencias" ? [...posts].reverse() : posts;
+  const { posts, nextCursor } = await fetchFeed({ tab });
 
   return (
     <div className="space-y-4">
@@ -37,19 +35,46 @@ export default async function HomePage({
       )}
       <FeedTabs active={tab} />
       <h1 className="sr-only">Inicio</h1>
-      {visible.length === 0 ? (
-        <EmptyState
-          icon={Users}
-          title="Aún no sigues a nadie"
-          description="Sigue a expertos o únete a una comunidad y sus publicaciones aparecerán aquí."
-          action={
-            <Link href="/explorar" className={buttonStyles("primary")}>
-              Explorar comunidades
-            </Link>
-          }
-        />
+      {posts.length === 0 ? (
+        tab === "siguiendo" ? (
+          viewer ? (
+            <EmptyState
+              icon={Users}
+              title="Aún no hay nada en tu feed"
+              description="Sigue a expertos o únete a una comunidad y sus publicaciones aparecerán aquí."
+              action={
+                <Link href="/explorar" className={buttonStyles("primary")}>
+                  Explorar comunidades
+                </Link>
+              }
+            />
+          ) : (
+            <EmptyState
+              icon={LogIn}
+              title="Inicia sesión para ver a quienes sigues"
+              description="Tu feed «Siguiendo» reúne lo que publican tus expertos y comunidades favoritas."
+              action={
+                <Link href="/login?next=/%3Ftab%3Dsiguiendo" className={buttonStyles("primary")}>
+                  Iniciar sesión
+                </Link>
+              }
+            />
+          )
+        ) : (
+          <EmptyState
+            icon={Lightbulb}
+            title="Todavía no hay publicaciones"
+            description="Sé la primera persona en compartir un consejo, una pregunta o un tutorial."
+            action={
+              <Link href="/publicar" className={buttonStyles("primary")}>
+                Publicar ahora
+              </Link>
+            }
+          />
+        )
       ) : (
-        visible.map((p) => <PostCard key={p.id} post={p} />)
+        // key: al cambiar de pestaña se reinicia el estado de la lista
+        <FeedList key={tab} initialPosts={posts} initialCursor={nextCursor} tab={tab} viewerId={viewer?.id} />
       )}
     </div>
   );

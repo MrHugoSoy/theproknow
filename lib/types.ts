@@ -16,6 +16,15 @@ export type AuthorSummary = {
   reputation: number;
 };
 
+export type CommentData = {
+  id: string;
+  parentId: string | null;
+  body: string;
+  isAccepted: boolean;
+  createdAt: string;
+  author: AuthorSummary;
+};
+
 export type CommunitySummary = {
   id: string;
   slug: string;

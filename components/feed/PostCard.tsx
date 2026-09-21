@@ -44,11 +44,14 @@ export function PostCard({
   post,
   viewerId,
   showFollow = true,
+  onDeleted,
 }: {
   post: PostCardData;
   /** id del usuario actual: oculta "Seguir" en sus propias publicaciones */
   viewerId?: string;
   showFollow?: boolean;
+  /** se llama al eliminar la publicación desde su menú */
+  onDeleted?: (postId: string) => void;
 }) {
   const { author, community } = post;
   const isQuestion = post.type === "pregunta";
@@ -82,7 +85,7 @@ export function PostCard({
         {showFollow && author.id !== viewerId && !post.viewer?.following ? (
           <FollowButton username={author.username} />
         ) : null}
-        <PostMenu postId={post.id} />
+        <PostMenu postId={post.id} isOwner={viewerId === author.id} onDeleted={onDeleted} />
       </header>
 
       <div className="mt-3 flex items-start gap-4">

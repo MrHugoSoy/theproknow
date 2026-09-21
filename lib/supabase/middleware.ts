@@ -2,8 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isSupabaseConfigured, requireSupabaseEnv } from "./env";
 
-const PROTECTED = ["/publicar", "/notificaciones", "/guardados", "/ajustes"];
-const AUTH_PAGES = ["/login", "/registro"];
+const PROTECTED = ["/publicar", "/notificaciones", "/guardados", "/ajustes", "/restablecer"];
+const AUTH_PAGES = ["/login", "/registro", "/recuperar"];
 
 const matches = (path: string, bases: string[]) =>
   bases.some((b) => path === b || path.startsWith(`${b}/`));

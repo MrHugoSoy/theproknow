@@ -2,16 +2,17 @@
 
 import { useActionState, useState } from "react";
 import { CircleHelp, FileText, GraduationCap, ImagePlus, Lightbulb, X, type LucideIcon } from "lucide-react";
-import { createPost } from "@/app/actions/posts";
+import { createPost, updatePost } from "@/app/actions/posts";
 import { Button } from "@/components/ui/Button";
 import { Markdown } from "@/components/ui/Markdown";
 import { TextField } from "@/components/ui/TextField";
 import { createClient } from "@/lib/supabase/client";
-import type { CommunitySummary, PostType } from "@/lib/types";
+import { POST_TYPE_LABEL, type CommunitySummary, type PostType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import {
   COVER_MAX_BYTES,
   COVER_MIME,
+  postEditSchema,
   postSchema,
   type PostFormState,
 } from "@/lib/validation/post";
@@ -27,18 +28,28 @@ type Props = {
   userId: string;
   communities: CommunitySummary[];
   initialType?: PostType;
+  /** modo edición: el tipo y la comunidad quedan fijos */
+  edit?: {
+    postId: string;
+    type: PostType;
+    communityName: string;
+    title: string;
+    body: string;
+    coverUrl: string;
+    videoUrl: string;
+  };
 };
 
-export function PostForm({ userId, communities, initialType = "consejo" }: Props) {
-  const [state, action, pending] = useActionState<PostFormState, FormData>(createPost, {});
+export function PostForm({ userId, communities, initialType = "consejo", edit }: Props) {
+  const [state, action, pending] = useActionState<PostFormState, FormData>(edit ? updatePost : createPost, {});
   const [clientErrors, setClientErrors] = useState<Record<string, string[] | undefined>>({});
-  const [type, setType] = useState<PostType>(initialType);
+  const [type, setType] = useState<PostType>(edit?.type ?? initialType);
   const [communityId, setCommunityId] = useState(communities[0]?.id ?? "");
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [videoUrl, setVideoUrl] = useState("");
+  const [title, setTitle] = useState(edit?.title ?? "");
+  const [body, setBody] = useState(edit?.body ?? "");
+  const [videoUrl, setVideoUrl] = useState(edit?.videoUrl ?? "");
   const [preview, setPreview] = useState(false);
-  const [coverUrl, setCoverUrl] = useState("");
+  const [coverUrl, setCoverUrl] = useState(edit?.coverUrl ?? "");
   const [coverError, setCoverError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -78,7 +89,9 @@ export function PostForm({ userId, communities, initialType = "consejo" }: Props
       action={action}
       noValidate
       onSubmit={(e) => {
-        const r = postSchema.safeParse({ type, communityId, title, body, coverUrl, videoUrl });
+        const r = edit
+          ? postEditSchema.safeParse({ postId: edit.postId, type, title, body, coverUrl, videoUrl })
+          : postSchema.safeParse({ type, communityId, title, body, coverUrl, videoUrl });
         if (!r.success) {
           e.preventDefault();
           setClientErrors(r.error.flatten().fieldErrors);
@@ -86,6 +99,16 @@ export function PostForm({ userId, communities, initialType = "consejo" }: Props
       }}
       className="space-y-6"
     >
+      {edit ? (
+        <div className="rounded-xl bg-surface px-4 py-3 text-sm text-muted">
+          <input type="hidden" name="postId" value={edit.postId} />
+          <input type="hidden" name="type" value={edit.type} />
+          Tipo: <strong className="text-ink">{POST_TYPE_LABEL[edit.type]}</strong> · Comunidad:{" "}
+          <strong className="text-ink">{edit.communityName}</strong>
+          <span className="block text-xs">El tipo y la comunidad no se pueden cambiar después de publicar.</span>
+        </div>
+      ) : (
+      <>
       <fieldset>
         <legend className="mb-2 text-sm font-semibold text-ink">Tipo de publicación</legend>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -136,6 +159,8 @@ export function PostForm({ userId, communities, initialType = "consejo" }: Props
           <p role="alert" className="mt-1 text-[13px] text-red-600">{errors.communityId[0]}</p>
         ) : null}
       </div>
+      </>
+      )}
 
       <TextField
         label="Título"
@@ -248,7 +273,7 @@ export function PostForm({ userId, communities, initialType = "consejo" }: Props
 
       <div className="flex justify-end">
         <Button type="submit" size="lg" disabled={pending || uploading}>
-          {pending ? "Publicando…" : "Publicar"}
+          {pending ? (edit ? "Guardando…" : "Publicando…") : edit ? "Guardar cambios" : "Publicar"}
         </Button>
       </div>
     </form>

@@ -159,7 +159,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
           {viewer?.id !== author.id && !following ? (
             <FollowButton username={author.username} />
           ) : null}
-          <PostMenu postId={post.id} />
+          <PostMenu postId={post.id} isOwner={viewer?.id === author.id} />
         </header>
 
         <div className="mt-4">

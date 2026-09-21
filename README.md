@@ -37,6 +37,7 @@ En tu proyecto de Supabase abre **SQL Editor** y ejecuta, **en este orden**, cad
 | 4 | `20260920000004_feeds_as_of.sql` | Paginación estable en feeds por puntaje |
 | 5 | `20260920000005_anon_reaction_select.sql` | Permiso de lectura para visitantes (RLS sigue ocultando las filas) |
 | 6 | `20260920000006_feed_search_saved.sql` | Búsqueda de texto y modo «guardados» |
+| 7 | `20260920000007_reputation_on_delete.sql` | Descuenta la reputación al borrar una publicación o una respuesta aceptada |
 
 Alternativa con la CLI de Supabase: `supabase link --project-ref <ref>` y `supabase db push`.
 

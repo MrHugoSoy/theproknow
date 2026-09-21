@@ -7,6 +7,7 @@ export const metadata: Metadata = { title: "Mensajes", robots: { index: false, f
 export default function MensajesPage() {
   return (
     <EmptyState
+      headingAs="h1"
       icon={MessageSquare}
       title="Próximamente"
       description="Estamos preparando los mensajes directos. Mientras tanto, conversa en los comentarios de cada publicación."

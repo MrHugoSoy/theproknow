@@ -60,7 +60,12 @@ export function FeedList({ initialPosts, initialCursor, tab, communitySlug, auth
   return (
     <div className="space-y-4">
       {posts.map((p) => (
-        <PostCard key={p.id} post={p} viewerId={viewerId} />
+        <PostCard
+          key={p.id}
+          post={p}
+          viewerId={viewerId}
+          onDeleted={(id) => setPosts((prev) => prev.filter((x) => x.id !== id))}
+        />
       ))}
       {pending ? <PostCardSkeleton /> : null}
       {error ? (

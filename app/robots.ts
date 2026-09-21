@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: "/",
         // Áreas privadas o sin valor para buscadores
-        disallow: ["/ajustes", "/notificaciones", "/guardados", "/publicar", "/buscar", "/mensajes", "/auth/", "/login", "/registro"],
+        disallow: ["/ajustes", "/notificaciones", "/guardados", "/publicar", "/buscar", "/mensajes", "/auth/", "/login", "/registro", "/recuperar", "/restablecer"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

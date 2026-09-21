@@ -4,6 +4,7 @@ import { FollowButton } from "@/components/feed/FollowButton";
 import { Avatar } from "@/components/ui/Avatar";
 import { buttonStyles } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { StickyAside } from "./StickyAside";
 import { getLevel } from "@/lib/reputation";
 import type { Expert, Trend } from "@/lib/data/sidebar";
 import type { Viewer } from "@/lib/data/viewer";
@@ -220,10 +221,9 @@ function Footer() {
 
 export function SidebarRight({ me, experts, trends }: SidebarRightProps) {
   return (
-    <aside
+    <StickyAside
       aria-label="Complementario"
-      // Fijo bajo el navbar y con scroll propio: como es más alto que la pantalla, así todo sigue alcanzable.
-      className="hidden w-[340px] shrink-0 space-y-4 py-5 pr-4 xl:sticky xl:top-14 xl:block xl:max-h-[calc(100vh-3.5rem)] xl:self-start xl:overflow-y-auto xl:overscroll-contain [scrollbar-width:thin]"
+      className="hidden w-[340px] shrink-0 space-y-4 py-5 pr-4 xl:sticky xl:block xl:self-start"
     >
       <QuoteCard />
       {me ? <ProfileCard me={me} /> : <JoinCard />}
@@ -231,6 +231,6 @@ export function SidebarRight({ me, experts, trends }: SidebarRightProps) {
       <Trends trends={trends} />
       <PublishCta />
       <Footer />
-    </aside>
+    </StickyAside>
   );
 }

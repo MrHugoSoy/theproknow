@@ -220,7 +220,11 @@ function Footer() {
 
 export function SidebarRight({ me, experts, trends }: SidebarRightProps) {
   return (
-    <aside aria-label="Complementario" className="hidden w-[340px] shrink-0 space-y-4 py-5 pr-4 xl:block">
+    <aside
+      aria-label="Complementario"
+      // Fijo bajo el navbar y con scroll propio: como es más alto que la pantalla, así todo sigue alcanzable.
+      className="hidden w-[340px] shrink-0 space-y-4 py-5 pr-4 xl:sticky xl:top-14 xl:block xl:max-h-[calc(100vh-3.5rem)] xl:self-start xl:overflow-y-auto xl:overscroll-contain [scrollbar-width:thin]"
+    >
       <QuoteCard />
       {me ? <ProfileCard me={me} /> : <JoinCard />}
       <TopExperts experts={experts} />

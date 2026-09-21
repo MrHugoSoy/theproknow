@@ -68,9 +68,9 @@ export function PostActions({ postId, isQuestion, likeCount, commentCount, helpf
           aria-pressed={state.like}
           aria-label={state.like ? "Quitar me gusta" : "Me gusta"}
           onClick={() => toggle("like")}
-          className="inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-like transition-colors hover:bg-red-50"
+          className="inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-red-600 transition-colors hover:bg-red-50"
         >
-          <Heart className={cn("size-5", state.like && "fill-like")} aria-hidden />
+          <Heart className={cn("size-5", state.like && "fill-red-600")} aria-hidden />
           {formatNumber(likes)}
         </button>
 

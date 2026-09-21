@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { MessageSquare } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 
-export const metadata: Metadata = { title: "Mensajes" };
+export const metadata: Metadata = { title: "Mensajes", robots: { index: false, follow: false } };
 
 export default function MensajesPage() {
   return (

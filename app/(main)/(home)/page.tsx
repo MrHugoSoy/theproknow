@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Lightbulb, LogIn, Users } from "lucide-react";
 import { Composer } from "@/components/feed/Composer";
@@ -8,6 +9,8 @@ import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { fetchFeed } from "@/lib/data/feed";
 import { getViewer } from "@/lib/data/viewer";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default async function HomePage({
   searchParams,

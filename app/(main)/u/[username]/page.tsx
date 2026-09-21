@@ -25,9 +25,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { username } = await params;
   const profile = await getProfileByUsername(username, null);
   if (!profile) return { title: "Perfil no encontrado" };
+  const title = `${profile.displayName} (@${profile.username})`;
+  const description = profile.bio ?? `Perfil de ${profile.displayName} en TheProKnow.`;
+  const path = `/u/${profile.username}`;
   return {
-    title: `${profile.displayName} (@${profile.username})`,
-    description: profile.bio ?? `Perfil de ${profile.displayName} en TheProKnow.`,
+    title,
+    description,
+    alternates: { canonical: path },
+    openGraph: { type: "profile", url: path, title, description, siteName: "TheProKnow", locale: "es_MX", username: profile.username },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 

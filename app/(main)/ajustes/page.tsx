@@ -9,7 +9,7 @@ import { getViewer } from "@/lib/data/viewer";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "Ajustes" };
+export const metadata: Metadata = { title: "Ajustes", robots: { index: false, follow: false } };
 
 export default async function SettingsPage() {
   const viewer = await getViewer();

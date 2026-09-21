@@ -19,7 +19,7 @@ export function TextField({ label, error, hint, id, className, ...rest }: Props)
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
         className={cn(
-          "h-11 w-full rounded-xl border bg-white px-3.5 text-sm text-ink placeholder:text-slate-400",
+          "h-11 w-full rounded-xl border bg-white px-3.5 text-sm text-ink placeholder:text-slate-500",
           error ? "border-red-500" : "border-line hover:border-slate-300",
           className,
         )}

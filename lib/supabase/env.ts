@@ -1,3 +1,5 @@
+import { SITE_URL } from "@/lib/site";
+
 export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -15,6 +17,7 @@ export function requireSupabaseEnv(): { url: string; anonKey: string } {
   return { url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY };
 }
 
+/** Origen público del sitio (para redirects de auth). Ver lib/site.ts. */
 export function getSiteUrl(): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
+  return SITE_URL;
 }

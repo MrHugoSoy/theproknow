@@ -8,12 +8,12 @@
   --color-surface: #f5f7fb;
   --color-line: #e6eaf2;
   --color-ink: #0f172a;
-  --color-muted: #64748b;
-  --color-like: #ef4444;
-  --color-helpful: #16a34a;
+  --color-muted: #5f6e85; /* AA sobre blanco y superficies grises */
+  --color-like: #ef4444; /* icono; para texto usar red-600 (AA) */
+  --color-helpful: #15803d; /* AA como texto y como fondo con texto blanco */
   --color-helpful-soft: #ecfdf3;
   --color-question: #7c3aed;
-  --color-tutorial: #16a34a;
+  --color-tutorial: #15803d;
   --color-article: #0369a1;
 
   --radius-card: 16px;

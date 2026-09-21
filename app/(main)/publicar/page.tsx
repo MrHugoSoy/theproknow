@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { getCommunities, getViewer } from "@/lib/data/viewer";
 import type { PostType } from "@/lib/types";
 
-export const metadata: Metadata = { title: "Publicar" };
+export const metadata: Metadata = { title: "Publicar", robots: { index: false, follow: false } };
 
 const TYPES: PostType[] = ["consejo", "pregunta", "tutorial", "articulo"];
 

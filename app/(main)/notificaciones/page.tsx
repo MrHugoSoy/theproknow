@@ -12,7 +12,7 @@ import { getViewer } from "@/lib/data/viewer";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { cn, timeAgo } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Notificaciones" };
+export const metadata: Metadata = { title: "Notificaciones", robots: { index: false, follow: false } };
 
 const TEXT: Record<NotificationItem["type"], string> = {
   like: "le dio me gusta a tu publicación",

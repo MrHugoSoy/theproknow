@@ -3,7 +3,7 @@ import Link from "next/link";
 import { GoogleButton } from "@/components/auth/GoogleButton";
 import { RegisterForm } from "@/components/auth/RegisterForm";
 
-export const metadata: Metadata = { title: "Crear cuenta" };
+export const metadata: Metadata = { title: "Crear cuenta", robots: { index: false, follow: true } };
 
 export default function RegisterPage() {
   return (

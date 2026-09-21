@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { z } from "zod";
 import { CommentSection } from "@/components/comments/CommentSection";
 import { FollowButton } from "@/components/feed/FollowButton";
-import { PostMenu } from "@/components/report/PostMenu";
 import { PostActions } from "@/components/feed/PostActions";
+import { PostMenu } from "@/components/report/PostMenu";
 import { Avatar } from "@/components/ui/Avatar";
 import { PostTypeBadge, VerifiedCheck } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
@@ -13,6 +14,7 @@ import { LevelBadge } from "@/components/ui/LevelBadge";
 import { Markdown } from "@/components/ui/Markdown";
 import { getComments } from "@/lib/data/comments";
 import { getViewer } from "@/lib/data/viewer";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
 import { markdownToExcerpt, parseYouTubeId } from "@/lib/text";
@@ -20,7 +22,8 @@ import { timeAgo } from "@/lib/utils";
 
 type Params = { id: string };
 
-async function getPost(id: string) {
+// `cache` evita repetir la consulta entre generateMetadata y la página.
+const getPost = cache(async (id: string) => {
   if (!isSupabaseConfigured() || !z.string().uuid().safeParse(id).success) return null;
   const supabase = await createClient();
   const { data } = await supabase
@@ -33,12 +36,30 @@ async function getPost(id: string) {
     .eq("id", id)
     .maybeSingle();
   return data;
-}
+});
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const post = await getPost((await params).id);
   if (!post) return { title: "Publicación no encontrada" };
-  return { title: post.title, description: markdownToExcerpt(post.body, 160) };
+  const description = markdownToExcerpt(post.body, 160);
+  const path = `/p/${post.id}`;
+  return {
+    title: post.title,
+    description,
+    alternates: { canonical: path },
+    openGraph: {
+      type: "article",
+      url: path,
+      title: post.title,
+      description,
+      siteName: SITE_NAME,
+      locale: "es_MX",
+      publishedTime: post.created_at,
+      authors: [post.author.display_name],
+      section: post.community.name,
+    },
+    twitter: { card: "summary_large_image", title: post.title, description },
+  };
 }
 
 export default async function PostPage({ params }: { params: Promise<Params> }) {
@@ -64,11 +85,57 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
   const { author, community } = post;
   const isQuestion = post.type === "pregunta";
-  const solved = isQuestion && comments.some((c) => c.isAccepted);
+  const accepted = comments.find((c) => c.isAccepted);
+  const solved = isQuestion && Boolean(accepted);
   const videoId = post.video_url ? parseYouTubeId(post.video_url) : null;
+
+  // Datos estructurados: pregunta → QAPage; el resto → Article.
+  const url = `${SITE_URL}/p/${post.id}`;
+  const authorLd = { "@type": "Person", name: author.display_name, url: `${SITE_URL}/u/${author.username}` };
+  const jsonLd = isQuestion
+    ? {
+        "@context": "https://schema.org",
+        "@type": "QAPage",
+        mainEntity: {
+          "@type": "Question",
+          name: post.title,
+          text: markdownToExcerpt(post.body, 500),
+          answerCount: comments.filter((c) => !c.parentId).length,
+          dateCreated: post.created_at,
+          author: authorLd,
+          ...(accepted
+            ? {
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: markdownToExcerpt(accepted.body, 500),
+                  dateCreated: accepted.createdAt,
+                  author: { "@type": "Person", name: accepted.author.displayName, url: `${SITE_URL}/u/${accepted.author.username}` },
+                  url: `${url}#c-${accepted.id}`,
+                },
+              }
+            : {}),
+        },
+      }
+    : {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: post.title,
+        description: markdownToExcerpt(post.body, 200),
+        datePublished: post.created_at,
+        author: authorLd,
+        publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+        mainEntityOfPage: url,
+        articleSection: community.name,
+        inLanguage: "es-MX",
+      };
 
   return (
     <article className="space-y-4">
+      {/* "<" escapado para que el contenido del usuario nunca pueda cerrar la etiqueta <script> */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
       <Card className="p-5 sm:p-6">
         <header className="flex items-center gap-3">
           <Link href={`/u/${author.username}`}>

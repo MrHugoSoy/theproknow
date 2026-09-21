@@ -4,7 +4,7 @@ import { GoogleButton } from "@/components/auth/GoogleButton";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { safeNext } from "@/lib/validation/auth";
 
-export const metadata: Metadata = { title: "Iniciar sesión" };
+export const metadata: Metadata = { title: "Iniciar sesión", robots: { index: false, follow: true } };
 
 const ERRORS: Record<string, string> = {
   oauth: "No pudimos iniciar sesión con Google. Inténtalo de nuevo.",

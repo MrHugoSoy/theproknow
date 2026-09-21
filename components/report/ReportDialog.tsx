@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { reportContent } from "@/app/actions/reports";
 import { Button } from "@/components/ui/Button";
@@ -15,6 +15,9 @@ type Props = {
 /** Diálogo modal nativo (<dialog>): trampa de foco y cierre con Escape sin código extra. */
 export function ReportDialog({ target, open, onClose }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
+  const uid = useId(); // ids únicos: hay un diálogo por tarjeta en la misma página
+  const titleId = `${uid}-title`;
+  const detailsId = `${uid}-details`;
   const router = useRouter();
   const pathname = usePathname();
   const [reason, setReason] = useState<ReportReason>("spam");
@@ -47,11 +50,11 @@ export function ReportDialog({ target, open, onClose }: Props) {
     <dialog
       ref={ref}
       onClose={onClose}
-      aria-labelledby="report-title"
+      aria-labelledby={titleId}
       className="m-auto w-[min(92vw,26rem)] rounded-card border border-line bg-white p-0 text-ink shadow-xl backdrop:bg-navy/50"
     >
       <form onSubmit={submit} className="space-y-4 p-5">
-        <h2 id="report-title" className="text-lg font-bold">
+        <h2 id={titleId} className="text-lg font-bold">
           Reportar contenido
         </h2>
 
@@ -83,11 +86,11 @@ export function ReportDialog({ target, open, onClose }: Props) {
               ))}
             </fieldset>
             <div>
-              <label htmlFor="report-details" className="mb-1 block text-sm font-semibold">
+              <label htmlFor={detailsId} className="mb-1 block text-sm font-semibold">
                 Detalles (opcional)
               </label>
               <textarea
-                id="report-details"
+                id={detailsId}
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
                 maxLength={400}

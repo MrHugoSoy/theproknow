@@ -59,7 +59,7 @@ export function CommentForm({
         autoFocus={autoFocus}
         placeholder={placeholder}
         aria-invalid={error ? true : undefined}
-        className="w-full rounded-xl border border-line bg-white p-3 text-sm text-ink placeholder:text-slate-400"
+        className="w-full rounded-xl border border-line bg-white p-3 text-sm text-ink placeholder:text-slate-500"
       />
       {error ? (
         <p role="alert" className="text-[13px] text-red-600">

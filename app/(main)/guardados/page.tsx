@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { fetchFeed } from "@/lib/data/feed";
 import { getViewer } from "@/lib/data/viewer";
 
-export const metadata: Metadata = { title: "Guardados" };
+export const metadata: Metadata = { title: "Guardados", robots: { index: false, follow: false } };
 
 export default async function SavedPage() {
   const viewer = await getViewer();

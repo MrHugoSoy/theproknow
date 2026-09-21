@@ -19,7 +19,14 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!isSupabaseConfigured()) return { title: "Comunidad" };
   const community = await getCommunityBySlug((await params).slug, null);
   if (!community) return { title: "Comunidad no encontrada" };
-  return { title: community.name, description: community.description ?? `Comunidad de ${community.name} en TheProKnow.` };
+  const description = community.description ?? `Comunidad de ${community.name} en TheProKnow.`;
+  const path = `/c/${community.slug}`;
+  return {
+    title: community.name,
+    description,
+    alternates: { canonical: path },
+    openGraph: { type: "website", url: path, title: community.name, description, siteName: "TheProKnow", locale: "es_MX" },
+  };
 }
 
 const TABS = ["tendencias", "nuevos"] as const;

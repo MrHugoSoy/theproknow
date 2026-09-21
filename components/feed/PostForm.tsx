@@ -176,7 +176,7 @@ export function PostForm({ userId, communities, initialType = "consejo" }: Props
             aria-invalid={errors.body ? true : undefined}
             aria-describedby="body-hint"
             className={cn(
-              "w-full rounded-xl border bg-white p-3.5 text-sm leading-relaxed text-ink placeholder:text-slate-400",
+              "w-full rounded-xl border bg-white p-3.5 text-sm leading-relaxed text-ink placeholder:text-slate-500",
               errors.body ? "border-red-500" : "border-line",
             )}
             placeholder="Cuenta lo que sabes. Puedes usar **negritas**, *cursivas*, listas y ## títulos."

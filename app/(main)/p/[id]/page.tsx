@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { z } from "zod";
 import { CommentSection } from "@/components/comments/CommentSection";
 import { FollowButton } from "@/components/feed/FollowButton";
+import { PostMenu } from "@/components/report/PostMenu";
 import { PostActions } from "@/components/feed/PostActions";
 import { Avatar } from "@/components/ui/Avatar";
 import { PostTypeBadge, VerifiedCheck } from "@/components/ui/Badge";
@@ -91,6 +92,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
           {viewer?.id !== author.id && !following ? (
             <FollowButton username={author.username} />
           ) : null}
+          <PostMenu postId={post.id} />
         </header>
 
         <div className="mt-4">

@@ -7,6 +7,7 @@ import { CircleCheck } from "lucide-react";
 import { deleteComment, toggleAcceptedAnswer } from "@/app/actions/comments";
 import { Avatar } from "@/components/ui/Avatar";
 import { VerifiedCheck } from "@/components/ui/Badge";
+import { ReportDialog } from "@/components/report/ReportDialog";
 import { LevelBadge } from "@/components/ui/LevelBadge";
 import { Markdown } from "@/components/ui/Markdown";
 import type { CommentData } from "@/lib/types";
@@ -78,6 +79,7 @@ function CommentItem({
   const pathname = usePathname();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [reporting, setReporting] = useState(false);
 
   const isMine = viewerId === c.author.id;
   const canAccept = isQuestion && !isReply && viewerId === postAuthorId && !isMine;
@@ -149,6 +151,18 @@ function CommentItem({
                 {c.isAccepted ? "Quitar aceptación" : "Aceptar respuesta"}
               </button>
             ) : null}
+            {!isMine ? (
+              <button
+                type="button"
+                className={link}
+                onClick={() => {
+                  if (!viewerId) router.push(`/login?next=${encodeURIComponent(pathname)}`);
+                  else setReporting(true);
+                }}
+              >
+                Reportar
+              </button>
+            ) : null}
             {isMine ? (
               <button
                 type="button"
@@ -186,6 +200,7 @@ function CommentItem({
           ) : null}
 
           {children ? <ul className="mt-3 space-y-4">{children}</ul> : null}
+          <ReportDialog target={{ commentId: c.id }} open={reporting} onClose={() => setReporting(false)} />
         </div>
       </div>
     </li>

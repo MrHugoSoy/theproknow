@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { markdownToExcerpt } from "@/lib/text";
 import type { PostCardData } from "@/lib/types";
 
-export type FeedTab = "para-ti" | "siguiendo" | "tendencias" | "nuevos";
+export type FeedTab = "para-ti" | "siguiendo" | "tendencias" | "nuevos" | "guardados";
 /** `asOf` fija el "ahora" de todas las páginas de una misma sesión (paginación estable). */
 export type FeedCursor = { score: number; id: string; asOf: string };
 export type FeedPage = { posts: PostCardData[]; nextCursor: FeedCursor | null };
@@ -16,11 +16,13 @@ type FeedRow = { [K in keyof Database["public"]["CompositeTypes"]["feed_row"]]: 
   author_avatar_url: string | null;
 };
 
-const RPC = {
-  "para-ti": "feed_para_ti",
-  siguiendo: "feed_siguiendo",
-  tendencias: "feed_tendencias",
-  nuevos: "feed_nuevos",
+/** Modo de `feed_page` para cada pestaña. */
+const MODE = {
+  "para-ti": "para_ti",
+  siguiendo: "siguiendo",
+  tendencias: "tendencias",
+  nuevos: "nuevos",
+  guardados: "guardados",
 } as const;
 
 export const FEED_PAGE_SIZE = 10;
@@ -31,6 +33,8 @@ type Options = {
   limit?: number;
   communitySlug?: string;
   authorUsername?: string;
+  /** búsqueda de texto en título y cuerpo (también acepta #etiquetas) */
+  query?: string;
 };
 
 function toCard(r: FeedRow): PostCardData {
@@ -78,21 +82,24 @@ export async function fetchFeed({
   limit = FEED_PAGE_SIZE,
   communitySlug,
   authorUsername,
+  query,
 }: Options): Promise<FeedPage> {
   if (!isSupabaseConfigured()) {
     // Modo demo sin Supabase
-    return { posts: tab === "siguiendo" ? [] : getMockPosts(), nextCursor: null };
+    return { posts: tab === "siguiendo" || tab === "guardados" ? [] : getMockPosts(), nextCursor: null };
   }
 
   const asOf = cursor?.asOf ?? new Date().toISOString();
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc(RPC[tab], {
+  const { data, error } = await supabase.rpc("feed_page", {
+    p_mode: MODE[tab],
     p_limit: limit + 1,
     p_cursor_score: cursor?.score,
     p_cursor_id: cursor?.id,
     p_community_slug: communitySlug,
     p_author_username: authorUsername,
     p_as_of: asOf,
+    p_query: query,
   });
   if (error) {
     console.error(`fetchFeed(${tab}):`, error);

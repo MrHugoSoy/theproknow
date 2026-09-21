@@ -4,7 +4,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 
 export type ReactionKind = "like" | "helpful" | "save";
-export type ActionResult = { ok: true } | { ok: false; error: "auth" | "self" | "unknown" };
+export type ActionResult = { ok: true } | { ok: false; error: "auth" | "self" | "forbidden" | "unknown" };
 
 const schema = z.object({
   kind: z.enum(["like", "helpful", "save"]),

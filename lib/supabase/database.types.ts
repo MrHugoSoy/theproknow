@@ -245,7 +245,7 @@ export type Database = {
       feed_para_ti: { Args: FeedArgs; Returns: Database["public"]["CompositeTypes"]["feed_row"][] };
       feed_siguiendo: { Args: FeedArgs; Returns: Database["public"]["CompositeTypes"]["feed_row"][] };
       feed_tendencias: { Args: FeedArgs; Returns: Database["public"]["CompositeTypes"]["feed_row"][] };
-      feed_page: { Args: FeedArgs & { p_mode: string }; Returns: Database["public"]["CompositeTypes"]["feed_row"][] };
+      feed_page: { Args: FeedArgs & { p_mode: string; p_query?: string }; Returns: Database["public"]["CompositeTypes"]["feed_row"][] };
       trending_tags: { Args: { p_limit?: number; p_days?: number }; Returns: { tag: string; posts: number }[] };
       reputation_level: {
         Args: { points: number };

@@ -14,11 +14,12 @@ type Props = {
   tab: FeedTab;
   communitySlug?: string;
   authorUsername?: string;
+  query?: string;
   viewerId?: string;
 };
 
 /** Lista con carga incremental (scroll infinito + botón de respaldo). */
-export function FeedList({ initialPosts, initialCursor, tab, communitySlug, authorUsername, viewerId }: Props) {
+export function FeedList({ initialPosts, initialCursor, tab, communitySlug, authorUsername, query, viewerId }: Props) {
   const [posts, setPosts] = useState(initialPosts);
   const [cursor, setCursor] = useState(initialCursor);
   const [error, setError] = useState(false);
@@ -32,7 +33,7 @@ export function FeedList({ initialPosts, initialCursor, tab, communitySlug, auth
     setError(false);
     startTransition(async () => {
       try {
-        const page = await loadMoreFeed({ tab, cursor, communitySlug, authorUsername });
+        const page = await loadMoreFeed({ tab, cursor, communitySlug, authorUsername, query });
         setPosts((prev) => {
           const seen = new Set(prev.map((p) => p.id));
           return [...prev, ...page.posts.filter((p) => !seen.has(p.id))];
@@ -44,7 +45,7 @@ export function FeedList({ initialPosts, initialCursor, tab, communitySlug, auth
         busy.current = false;
       }
     });
-  }, [cursor, tab, communitySlug, authorUsername]);
+  }, [cursor, tab, communitySlug, authorUsername, query]);
 
   useEffect(() => {
     const el = sentinel.current;

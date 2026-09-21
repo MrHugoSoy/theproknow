@@ -10,22 +10,33 @@ export const FEED_TABS = [
 
 export type FeedTab = (typeof FEED_TABS)[number]["key"];
 
-export function parseTab(value: string | string[] | undefined): FeedTab {
+export function parseTab(value: string | string[] | undefined, allowed?: readonly FeedTab[], fallback: FeedTab = "para-ti"): FeedTab {
   const v = Array.isArray(value) ? value[0] : value;
-  return FEED_TABS.some((t) => t.key === v) ? (v as FeedTab) : "para-ti";
+  const pool = allowed ?? FEED_TABS.map((t) => t.key);
+  return (pool as readonly string[]).includes(v ?? "") ? (v as FeedTab) : fallback;
 }
 
+type Props = {
+  active: FeedTab;
+  basePath?: string;
+  /** subconjunto de pestañas a mostrar (por defecto, las cuatro) */
+  tabs?: readonly FeedTab[];
+  /** pestaña que vive en `basePath` sin `?tab=` */
+  defaultTab?: FeedTab;
+};
+
 /** Tabs por URL (?tab=): funcionan sin JS y se pueden compartir. */
-export function FeedTabs({ active, basePath = "/" }: { active: FeedTab; basePath?: string }) {
+export function FeedTabs({ active, basePath = "/", tabs, defaultTab = "para-ti" }: Props) {
+  const shown = tabs ? FEED_TABS.filter((t) => tabs.includes(t.key)) : FEED_TABS;
   return (
     <nav aria-label="Ordenar publicaciones" className="border-b border-line">
       <ul className="flex gap-1 overflow-x-auto px-1">
-        {FEED_TABS.map((t) => {
+        {shown.map((t) => {
           const on = t.key === active;
           return (
             <li key={t.key}>
               <Link
-                href={t.key === "para-ti" ? basePath : `${basePath}?tab=${t.key}`}
+                href={t.key === defaultTab ? basePath : `${basePath}?tab=${t.key}`}
                 aria-current={on ? "page" : undefined}
                 className={cn(
                   "-mb-px block whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium",

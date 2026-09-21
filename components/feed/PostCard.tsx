@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { Ellipsis, Play } from "lucide-react";
+import { Play } from "lucide-react";
 import { Avatar, AvatarStack } from "@/components/ui/Avatar";
 import { PostTypeBadge, VerifiedCheck } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { PostMenu } from "@/components/report/PostMenu";
 import type { PostCardData } from "@/lib/types";
 import { timeAgo } from "@/lib/utils";
 import { FollowButton } from "./FollowButton";
@@ -81,13 +82,7 @@ export function PostCard({
         {showFollow && author.id !== viewerId && !post.viewer?.following ? (
           <FollowButton username={author.username} />
         ) : null}
-        <button
-          type="button"
-          aria-label="Más opciones"
-          className="flex size-8 items-center justify-center rounded-full text-muted hover:bg-surface"
-        >
-          <Ellipsis className="size-5" aria-hidden />
-        </button>
+        <PostMenu postId={post.id} />
       </header>
 
       <div className="mt-3 flex items-start gap-4">

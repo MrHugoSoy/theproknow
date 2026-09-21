@@ -298,6 +298,7 @@ type FeedArgs = {
   p_cursor_id?: string;
   p_community_slug?: string;
   p_author_username?: string;
+  p_as_of?: string;
 };
 
 type PublicSchema = Database["public"];

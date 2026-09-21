@@ -6,7 +6,8 @@ import { markdownToExcerpt } from "@/lib/text";
 import type { PostCardData } from "@/lib/types";
 
 export type FeedTab = "para-ti" | "siguiendo" | "tendencias" | "nuevos";
-export type FeedCursor = { score: number; id: string };
+/** `asOf` fija el "ahora" de todas las páginas de una misma sesión (paginación estable). */
+export type FeedCursor = { score: number; id: string; asOf: string };
 export type FeedPage = { posts: PostCardData[]; nextCursor: FeedCursor | null };
 
 type FeedRow = { [K in keyof Database["public"]["CompositeTypes"]["feed_row"]]: NonNullable<Database["public"]["CompositeTypes"]["feed_row"][K]> } & {
@@ -83,6 +84,7 @@ export async function fetchFeed({
     return { posts: tab === "siguiendo" ? [] : getMockPosts(), nextCursor: null };
   }
 
+  const asOf = cursor?.asOf ?? new Date().toISOString();
   const supabase = await createClient();
   const { data, error } = await supabase.rpc(RPC[tab], {
     p_limit: limit + 1,
@@ -90,6 +92,7 @@ export async function fetchFeed({
     p_cursor_id: cursor?.id,
     p_community_slug: communitySlug,
     p_author_username: authorUsername,
+    p_as_of: asOf,
   });
   if (error) {
     console.error(`fetchFeed(${tab}):`, error);
@@ -101,6 +104,6 @@ export async function fetchFeed({
   const last = page[page.length - 1];
   return {
     posts: page.map(toCard),
-    nextCursor: rows.length > limit && last ? { score: last.score, id: last.id } : null,
+    nextCursor: rows.length > limit && last ? { score: last.score, id: last.id, asOf } : null,
   };
 }

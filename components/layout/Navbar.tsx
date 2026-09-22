@@ -13,7 +13,7 @@ export function Navbar({ viewer }: { viewer: Viewer | null }) {
   return (
     <header className="sticky top-0 z-50 h-14 bg-navy text-white">
       <div className="mx-auto flex h-full max-w-[1400px] items-center gap-3 px-4">
-        <Logo className="shrink-0 max-sm:[&_span:first-child]:text-xl" tagline={false} />
+        <Logo className="shrink-0" tagline={false} />
 
         <form action="/buscar" role="search" className="mx-auto hidden w-full max-w-md md:block">
           <label htmlFor="q" className="sr-only">

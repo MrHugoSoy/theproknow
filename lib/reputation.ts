@@ -16,6 +16,7 @@ export type LevelInfo = {
 
 /** Espejo en TypeScript de la función SQL `reputation_level` (Fase 2). */
 export function getLevel(points: number): LevelInfo {
+  points = Math.max(0, points); // igual que `greatest(coalesce(points,0),0)` en SQL
   let idx = 0;
   LEVELS.forEach((l, i) => {
     if (points >= l.min) idx = i;

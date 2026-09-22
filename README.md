@@ -92,9 +92,28 @@ Abre <http://localhost:3000>. Sin variables de Supabase la app arranca en **modo
 | `npm start` | Sirve la compilación |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint |
+| `npm test` | Pruebas unitarias (Vitest) |
+| `npm run test:e2e` | Pruebas de extremo a extremo (Playwright) |
 
 > Si compilas mientras `next dev` está abierto, usa un directorio aparte para no pisar su caché:
 > `NEXT_DIST_DIR=.next-build npm run build`.
+
+## Pruebas
+
+- **Unitarias** (`lib/**/*.test.ts`, Vitest): reputación y niveles, utilidades de texto/fecha/formato, y
+  cada esquema de `lib/validation`. Son funciones puras, sin Supabase ni red — se ejecutan con `npm test`.
+- **Extremo a extremo** (`e2e/*.spec.ts`, Playwright): navegación pública, páginas estáticas, 404 (ruta
+  desconocida, post/perfil/comunidad inexistentes) y `robots.txt`/`sitemap.xml`. Se ejecutan con
+  `npm run test:e2e` (la primera vez, instala el navegador con `npx playwright install chromium`).
+  Estas pruebas usan un navegador sin sesión iniciada y pasan igual **con o sin** Supabase configurado,
+  para que corran en CI sin necesitar secretos. Cubren solo lectura: publicar, comentar, reaccionar,
+  etc. no tienen pruebas automatizadas todavía y se han verificado manualmente contra un proyecto real.
+
+## Integración continua
+
+`.github/workflows/ci.yml` corre en cada push y pull request a `main`: tipos, lint, pruebas unitarias,
+build de producción y las pruebas E2E. No requiere configurar ningún secreto — todo corre en "modo
+demo" (sin variables de Supabase), igual que se describe arriba.
 
 ## Despliegue en Vercel
 

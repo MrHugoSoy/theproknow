@@ -1,11 +1,13 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { CircleHelp, FileText, GraduationCap, ImagePlus, Lightbulb, X, type LucideIcon } from "lucide-react";
 import { createPost, updatePost } from "@/app/actions/posts";
+import { MarkdownToolbar, type MarkdownAction } from "@/components/feed/MarkdownToolbar";
 import { Button } from "@/components/ui/Button";
 import { Markdown } from "@/components/ui/Markdown";
 import { TextField } from "@/components/ui/TextField";
+import { insertLink, toggleLinePrefix, wrapSelection } from "@/lib/markdown-editor";
 import { createClient } from "@/lib/supabase/client";
 import { POST_TYPE_LABEL, type CommunitySummary, type PostType } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -16,6 +18,8 @@ import {
   postSchema,
   type PostFormState,
 } from "@/lib/validation/post";
+
+const BODY_MAX = 20_000;
 
 const TYPES: { value: PostType; label: string; hint: string; icon: LucideIcon }[] = [
   { value: "consejo", label: "Consejo", hint: "Comparte un truco o buena práctica", icon: Lightbulb },
@@ -52,6 +56,8 @@ export function PostForm({ userId, communities, initialType = "consejo", edit }:
   const [coverUrl, setCoverUrl] = useState(edit?.coverUrl ?? "");
   const [coverError, setCoverError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const errors = { ...state.errors, ...clientErrors };
 
@@ -82,6 +88,33 @@ export function PostForm({ userId, communities, initialType = "consejo", edit }:
     } finally {
       setUploading(false);
     }
+  }
+
+  /** Aplica una acción de la barra de formato sobre la selección actual del textarea. */
+  function applyMarkdown(action: MarkdownAction) {
+    const el = textareaRef.current;
+    if (!el) return;
+    const selection = { start: el.selectionStart, end: el.selectionEnd };
+    const result =
+      action === "bold"
+        ? wrapSelection(body, selection, "**", "**", "texto en negrita")
+        : action === "italic"
+          ? wrapSelection(body, selection, "*", "*", "texto en cursiva")
+          : action === "code"
+            ? wrapSelection(body, selection, "`", "`", "código")
+            : action === "link"
+              ? insertLink(body, selection)
+              : action === "heading"
+                ? toggleLinePrefix(body, selection, "## ")
+                : action === "list"
+                  ? toggleLinePrefix(body, selection, "- ")
+                  : toggleLinePrefix(body, selection, "> ");
+    setBody(result.value);
+    // El cambio de valor recién se aplica al textarea en el siguiente render.
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(result.selection.start, result.selection.end);
+    });
   }
 
   return (
@@ -191,31 +224,47 @@ export function PostForm({ userId, communities, initialType = "consejo", edit }:
             {body.trim() ? <Markdown>{body}</Markdown> : <p className="text-sm text-muted">Nada que mostrar todavía.</p>}
           </div>
         ) : (
-          <textarea
-            id="body"
-            name="body"
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            rows={10}
-            maxLength={20000}
-            aria-invalid={errors.body ? true : undefined}
-            aria-describedby="body-hint"
-            className={cn(
-              "w-full rounded-xl border bg-white p-3.5 text-sm leading-relaxed text-ink placeholder:text-slate-500",
-              errors.body ? "border-red-500" : "border-line",
-            )}
-            placeholder="Cuenta lo que sabes. Puedes usar **negritas**, *cursivas*, listas y ## títulos."
-          />
+          <>
+            <MarkdownToolbar onAction={applyMarkdown} />
+            <textarea
+              id="body"
+              ref={textareaRef}
+              name="body"
+              value={body}
+              onChange={(e) => {
+                setBody(e.target.value);
+                const el = e.currentTarget;
+                el.style.height = "auto";
+                el.style.height = `${Math.min(el.scrollHeight, 480)}px`;
+              }}
+              rows={10}
+              maxLength={BODY_MAX}
+              aria-invalid={errors.body ? true : undefined}
+              aria-describedby="body-hint"
+              className={cn(
+                "block w-full resize-y rounded-b-xl border bg-white p-3.5 text-sm leading-relaxed text-ink placeholder:text-slate-500",
+                errors.body ? "border-red-500" : "border-line",
+              )}
+              placeholder="Cuenta lo que sabes. Puedes usar **negritas**, *cursivas*, listas y ## títulos."
+            />
+          </>
         )}
         {/* En vista previa el textarea no existe: se envía el valor en un campo oculto */}
         {preview ? <input type="hidden" name="body" value={body} /> : null}
-        {errors.body?.[0] ? (
-          <p role="alert" className="mt-1 text-[13px] text-red-600">{errors.body[0]}</p>
-        ) : (
-          <p id="body-hint" className="mt-1 text-[13px] text-muted">
-            Markdown básico, sin HTML. Añade #etiquetas al final para que te encuentren.
+        <div className="mt-1 flex items-start justify-between gap-3">
+          {errors.body?.[0] ? (
+            <p role="alert" className="text-[13px] text-red-600">
+              {errors.body[0]}
+            </p>
+          ) : (
+            <p id="body-hint" className="text-[13px] text-muted">
+              Markdown básico, sin HTML. Añade #etiquetas al final para que te encuentren.
+            </p>
+          )}
+          <p className={cn("shrink-0 text-[13px]", body.length > BODY_MAX * 0.95 ? "text-amber-700" : "text-muted")}>
+            {body.length.toLocaleString("es-MX")}/{BODY_MAX.toLocaleString("es-MX")}
           </p>
-        )}
+        </div>
       </div>
 
       {type === "tutorial" ? (
@@ -248,9 +297,24 @@ export function PostForm({ userId, communities, initialType = "consejo", edit }:
             </button>
           </div>
         ) : (
-          <label className="flex h-28 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-slate-300 bg-white text-sm text-muted hover:bg-surface has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-brand">
+          <label
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragOver(true);
+            }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragOver(false);
+              onCover(e.dataTransfer.files[0]);
+            }}
+            className={cn(
+              "flex h-28 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed text-sm text-muted has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-brand",
+              dragOver ? "border-brand bg-brand-soft" : "border-slate-300 bg-white hover:bg-surface",
+            )}
+          >
             <ImagePlus className="size-6" aria-hidden />
-            {uploading ? "Subiendo…" : "Sube una imagen JPG, PNG o WebP (máx. 5 MB)"}
+            {uploading ? "Subiendo…" : dragOver ? "Suelta la imagen aquí" : "Arrastra una imagen o haz clic (JPG, PNG o WebP, máx. 5 MB)"}
             <input
               type="file"
               accept={COVER_MIME.join(",")}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CircleHelp, FileText, GraduationCap, Image as ImageIcon, Lightbulb, type LucideIcon } from "lucide-react";
+import { CircleHelp, FileText, GraduationCap, Lightbulb, type LucideIcon } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
 import { buttonStyles } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -9,7 +9,6 @@ const CHIPS: { tipo: string; label: string; icon: LucideIcon }[] = [
   { tipo: "pregunta", label: "Pregunta", icon: CircleHelp },
   { tipo: "tutorial", label: "Tutorial", icon: GraduationCap },
   { tipo: "articulo", label: "Artículo", icon: FileText },
-  { tipo: "imagen", label: "Imagen", icon: ImageIcon },
 ];
 
 export function Composer({ displayName, avatarUrl }: { displayName: string; avatarUrl: string | null }) {

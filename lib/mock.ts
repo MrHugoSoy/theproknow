@@ -28,10 +28,10 @@ export const MOCK_UNREAD_NOTIFICATIONS = 3;
 export const MOCK_COMMUNITIES: CommunitySummary[] = [
   { id: "diseno-grafico", slug: "diseno-grafico", name: "Diseño Gráfico", icon: "palette", isActive: true },
   { id: "fotografia", slug: "fotografia", name: "Fotografía", icon: "camera", isActive: true },
-  { id: "inteligencia-artificial", slug: "inteligencia-artificial", name: "Inteligencia Artificial", icon: "bot", isActive: false },
-  { id: "negocios", slug: "negocios", name: "Negocios", icon: "briefcase", isActive: false },
+  { id: "inteligencia-artificial", slug: "inteligencia-artificial", name: "Inteligencia Artificial", icon: "bot", isActive: true },
+  { id: "negocios", slug: "negocios", name: "Negocios", icon: "briefcase", isActive: true },
   { id: "carpinteria", slug: "carpinteria", name: "Carpintería", icon: "hammer", isActive: true },
-  { id: "productividad", slug: "productividad", name: "Productividad", icon: "zap", isActive: false },
+  { id: "productividad", slug: "productividad", name: "Productividad", icon: "zap", isActive: true },
 ];
 
 const c = (slug: string) => MOCK_COMMUNITIES.find((x) => x.slug === slug)!;

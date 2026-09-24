@@ -39,6 +39,7 @@ En tu proyecto de Supabase abre **SQL Editor** y ejecuta, **en este orden**, cad
 | 6 | `20260920000006_feed_search_saved.sql` | Búsqueda de texto y modo «guardados» |
 | 7 | `20260920000007_reputation_on_delete.sql` | Descuenta la reputación al borrar una publicación o una respuesta aceptada |
 | 8 | `20260923000001_activate_carpinteria.sql` | Activa la comunidad Carpintería (se puede publicar y unirse) |
+| 9 | `20260923000002_activate_all_communities.sql` | Activa las 3 comunidades restantes: las 6 quedan abiertas |
 
 Alternativa con la CLI de Supabase: `supabase link --project-ref <ref>` y `supabase db push`.
 

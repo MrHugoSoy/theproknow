@@ -71,7 +71,7 @@ export default async function CommunityPage({
         <EmptyState
           icon={Clock}
           title="Próximamente"
-          description={`La comunidad de ${community.name} abrirá pronto. Mientras tanto, explora Diseño Gráfico y Fotografía.`}
+          description={`La comunidad de ${community.name} abrirá pronto. Mientras tanto, explora las comunidades que ya están abiertas.`}
         />
       ) : (
         <>

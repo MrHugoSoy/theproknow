@@ -30,7 +30,7 @@ export const MOCK_COMMUNITIES: CommunitySummary[] = [
   { id: "fotografia", slug: "fotografia", name: "Fotografía", icon: "camera", isActive: true },
   { id: "inteligencia-artificial", slug: "inteligencia-artificial", name: "Inteligencia Artificial", icon: "bot", isActive: false },
   { id: "negocios", slug: "negocios", name: "Negocios", icon: "briefcase", isActive: false },
-  { id: "carpinteria", slug: "carpinteria", name: "Carpintería", icon: "hammer", isActive: false },
+  { id: "carpinteria", slug: "carpinteria", name: "Carpintería", icon: "hammer", isActive: true },
   { id: "productividad", slug: "productividad", name: "Productividad", icon: "zap", isActive: false },
 ];
 

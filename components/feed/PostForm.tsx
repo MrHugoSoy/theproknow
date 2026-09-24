@@ -48,7 +48,8 @@ export function PostForm({ userId, communities, initialType = "consejo", edit }:
   const [state, action, pending] = useActionState<PostFormState, FormData>(edit ? updatePost : createPost, {});
   const [clientErrors, setClientErrors] = useState<Record<string, string[] | undefined>>({});
   const [type, setType] = useState<PostType>(edit?.type ?? initialType);
-  const [communityId, setCommunityId] = useState(communities[0]?.id ?? "");
+  // Con varias comunidades activas no se preselecciona ninguna: evita publicar en la equivocada por descuido.
+  const [communityId, setCommunityId] = useState(communities.length === 1 ? communities[0]!.id : "");
   const [title, setTitle] = useState(edit?.title ?? "");
   const [body, setBody] = useState(edit?.body ?? "");
   const [videoUrl, setVideoUrl] = useState(edit?.videoUrl ?? "");
@@ -182,6 +183,9 @@ export function PostForm({ userId, communities, initialType = "consejo", edit }:
           aria-invalid={errors.communityId ? true : undefined}
           className="h-11 w-full rounded-xl border border-line bg-white px-3 text-sm text-ink"
         >
+          <option value="" disabled>
+            Elige una comunidad…
+          </option>
           {communities.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}

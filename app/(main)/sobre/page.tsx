@@ -18,7 +18,7 @@ export default function AboutPage() {
         <li>Ganar reputación cuando lo que compartes es útil para otras personas.</li>
       </ul>
       <h2>Comunidades</h2>
-      <p>Empezamos con Diseño Gráfico y Fotografía. Inteligencia Artificial, Negocios, Carpintería y Productividad llegarán pronto.</p>
+      <p>Empezamos con Diseño Gráfico, Fotografía y Carpintería. Inteligencia Artificial, Negocios y Productividad llegarán pronto.</p>
     </InfoPage>
   );
 }

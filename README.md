@@ -77,6 +77,8 @@ Rellena `.env.local` (Project Settings → API en Supabase):
 
 Pega [`supabase/seed.sql`](supabase/seed.sql) en el SQL Editor. Crea 12 usuarios ficticios, 30 publicaciones y 48 comentarios en español (Diseño Gráfico y Fotografía), con likes, «Me ayudó» y respuestas aceptadas. Es idempotente: se puede volver a ejecutar, y solo toca cuentas `@seed.theproknow.test`. Esos usuarios no tienen contraseña, así que nadie puede iniciar sesión con ellos.
 
+Después, opcionalmente, [`supabase/seed_comunidades.sql`](supabase/seed_comunidades.sql) añade 8 usuarios, 16 publicaciones y sus comentarios para Carpintería, Inteligencia Artificial, Negocios y Productividad, sin tocar lo anterior. Antes de lanzar, borra todos los datos de ejemplo con `delete from auth.users where email like '%@seed.theproknow.test';`.
+
 ### 6. Arrancar
 
 ```bash

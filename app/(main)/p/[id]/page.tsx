@@ -176,7 +176,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
         {post.cover_url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={post.cover_url} alt="" className="mt-4 max-h-96 w-full rounded-xl object-cover" />
+          <img src={post.cover_url} alt="" className="mt-4 aspect-video w-full rounded-xl object-cover" />
         ) : null}
 
         {videoId ? (

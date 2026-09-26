@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { getNavItems, isActive } from "./nav-items";
 
+/** Etiquetas cortas para que quepan bajo cada icono; el nombre completo va en aria-label. */
+const SHORT_LABELS: Record<string, string> = { "Iniciar sesión": "Entrar", Notificaciones: "Avisos", "Mi perfil": "Perfil" };
 const MOBILE_HREFS_EXCLUDE = new Set(["/guardados"]);
 
 /** Bottom-nav de 5 íconos para móvil (Guardados vive dentro del perfil). */
@@ -32,11 +34,12 @@ export function BottomNav({
                 aria-label={label}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative flex h-14 items-center justify-center",
+                  "relative flex h-14 flex-col items-center justify-center gap-0.5",
                   active ? "text-brand" : "text-muted",
                 )}
               >
-                <Icon className="size-6" aria-hidden />
+                <Icon className="size-5" aria-hidden />
+                <span className="text-[11px] font-medium leading-none">{SHORT_LABELS[label] ?? label}</span>
                 {badge === "notifications" && unreadNotifications > 0 ? (
                   <span
                     aria-label={`${unreadNotifications} notificaciones sin leer`}

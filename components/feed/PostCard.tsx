@@ -69,7 +69,7 @@ export function PostCard({
             </Link>
             {author.isVerified ? <VerifiedCheck /> : null}
           </p>
-          <p className="truncate text-[13px] text-muted" suppressHydrationWarning>
+          <p className="line-clamp-2 text-[13px] text-muted" suppressHydrationWarning>
             @{author.username} · {timeAgo(post.createdAt)}
             {community ? (
               <>

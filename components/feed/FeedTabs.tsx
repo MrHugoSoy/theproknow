@@ -30,7 +30,7 @@ export function FeedTabs({ active, basePath = "/", tabs, defaultTab = "para-ti" 
   const shown = tabs ? FEED_TABS.filter((t) => tabs.includes(t.key)) : FEED_TABS;
   return (
     <nav aria-label="Ordenar publicaciones" className="border-b border-line">
-      <ul className="flex gap-1 overflow-x-auto px-1">
+      <ul className="flex gap-1 overflow-x-auto overflow-y-hidden px-1 pb-px">
         {shown.map((t) => {
           const on = t.key === active;
           return (

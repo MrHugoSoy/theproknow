@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { SUPABASE_URL } from "@/lib/supabase/env";
+import { removeOwnedFile } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
 import { canonicalYouTubeUrl, postEditSchema, postSchema, type PostFormState } from "@/lib/validation/post";
 import type { ActionResult } from "./reactions";
@@ -117,6 +118,11 @@ export async function updatePost(_prev: PostFormState, formData: FormData): Prom
     return { message: "No pudimos guardar los cambios. Inténtalo de nuevo." };
   }
 
+  // La portada anterior ya no se usa: se libera su archivo.
+  if (current.cover_url && current.cover_url !== (v.coverUrl || null)) {
+    await removeOwnedFile(supabase, "covers", current.cover_url, user.id);
+  }
+
   revalidatePath(`/p/${v.postId}`);
   revalidatePath("/", "layout");
   redirect(`/p/${v.postId}`);
@@ -134,12 +140,18 @@ export async function deletePost(postId: string): Promise<ActionResult> {
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "auth" };
 
-  const { data, error } = await supabase.from("posts").delete().eq("id", postId).eq("author_id", user.id).select("id");
+  const { data, error } = await supabase
+    .from("posts")
+    .delete()
+    .eq("id", postId)
+    .eq("author_id", user.id)
+    .select("id, cover_url");
   if (error) {
     console.error("deletePost:", error);
     return { ok: false, error: "unknown" };
   }
   if (!data?.length) return { ok: false, error: "forbidden" };
+  await removeOwnedFile(supabase, "covers", data[0]!.cover_url, user.id);
 
   revalidatePath("/", "layout");
   return { ok: true };

@@ -1,11 +1,15 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { Database } from "./database.types";
-import { requireSupabaseEnv } from "./env";
+import { isSupabaseConfigured, requireSupabaseEnv } from "./env";
 
 /** Cliente para Server Components, Server Actions y Route Handlers. */
 export async function createClient() {
-  const { url, anonKey } = requireSupabaseEnv();
+  // Modo demo: sin variables no hay sesión posible. Un cliente con valores de relleno hace que
+  // `auth.getUser()` devuelva null sin red, y las Server Actions responden "auth" en vez de lanzar.
+  const { url, anonKey } = isSupabaseConfigured()
+    ? requireSupabaseEnv()
+    : { url: "http://localhost:54321", anonKey: "demo" };
   const cookieStore = await cookies();
   return createServerClient<Database>(url, anonKey, {
     cookies: {

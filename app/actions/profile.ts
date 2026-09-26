@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { SUPABASE_URL } from "@/lib/supabase/env";
+import { removeOwnedFile } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
 import { profileSchema, type ProfileFormState } from "@/lib/validation/profile";
 
@@ -46,6 +47,10 @@ export async function updateProfile(_prev: ProfileFormState, formData: FormData)
     if (error.code === "23505") return { errors: { username: ["Ese nombre de usuario ya está en uso"] } };
     console.error("updateProfile:", error);
     return { message: "No pudimos guardar los cambios. Inténtalo de nuevo." };
+  }
+
+  if (current?.avatar_url && current.avatar_url !== (v.avatarUrl || null)) {
+    await removeOwnedFile(supabase, "avatars", current.avatar_url, user.id);
   }
 
   revalidatePath("/", "layout");

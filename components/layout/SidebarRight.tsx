@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Star } from "lucide-react";
+import { Check, Circle, Star } from "lucide-react";
 import { FollowButton } from "@/components/feed/FollowButton";
 import { Avatar } from "@/components/ui/Avatar";
 import { buttonStyles } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { OwnProfileSlot } from "./OwnProfileSlot";
 import { StickyAside } from "./StickyAside";
 import { getLevel } from "@/lib/reputation";
 import type { Expert, Trend } from "@/lib/data/sidebar";
@@ -11,7 +12,7 @@ import type { Viewer } from "@/lib/data/viewer";
 import { formatNumber } from "@/lib/utils";
 
 export type SidebarRightProps = {
-  me: Pick<Viewer, "username" | "displayName" | "avatarUrl" | "reputation" | "posts" | "followers" | "following"> | null;
+  me: Pick<Viewer, "username" | "displayName" | "avatarUrl" | "reputation" | "posts" | "followers" | "following" | "hasBio" | "joinedCommunities"> | null;
   experts: Expert[];
   trends: Trend[];
 };
@@ -108,6 +109,56 @@ function ProfileCard({ me }: { me: NonNullable<SidebarRightProps["me"]> }) {
           </Link>
         </div>
       </div>
+    </Card>
+  );
+}
+
+/** Pasos para activar una cuenta nueva. Se oculta solo cuando todos están completos. */
+function ProfileChecklist({ me }: { me: NonNullable<SidebarRightProps["me"]> }) {
+  const steps = [
+    { label: "Añade tu foto", done: Boolean(me.avatarUrl), href: "/ajustes" },
+    { label: "Escribe tu bio", done: me.hasBio, href: "/ajustes" },
+    { label: "Únete a una comunidad", done: me.joinedCommunities > 0, href: "/explorar" },
+    { label: "Sigue a 3 personas", done: me.following >= 3, href: "/explorar" },
+    { label: "Publica tu primer consejo", done: me.posts > 0, href: "/publicar" },
+  ];
+  const done = steps.filter((s) => s.done).length;
+  if (done === steps.length) return null;
+  return (
+    <Card className="p-5">
+      <div className="flex items-baseline justify-between">
+        <h2 className="text-[15px] font-bold text-ink">Completa tu perfil</h2>
+        <span className="text-[13px] font-medium text-muted">
+          {done} de {steps.length}
+        </span>
+      </div>
+      <div
+        role="progressbar"
+        aria-label="Pasos completados"
+        aria-valuenow={done}
+        aria-valuemin={0}
+        aria-valuemax={steps.length}
+        className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200"
+      >
+        <div className="h-full rounded-full bg-brand" style={{ width: `${(done / steps.length) * 100}%` }} />
+      </div>
+      <ul className="mt-3 space-y-1">
+        {steps.map((s) => (
+          <li key={s.label}>
+            {s.done ? (
+              <span className="flex items-center gap-2.5 rounded-lg px-1 py-1.5 text-sm text-muted line-through">
+                <Check className="size-4 text-emerald-600" aria-hidden />
+                {s.label}
+              </span>
+            ) : (
+              <Link href={s.href} className="flex items-center gap-2.5 rounded-lg px-1 py-1.5 text-sm font-medium text-ink hover:bg-surface">
+                <Circle className="size-4 text-slate-300" aria-hidden />
+                {s.label}
+              </Link>
+            )}
+          </li>
+        ))}
+      </ul>
     </Card>
   );
 }
@@ -226,7 +277,13 @@ export function SidebarRight({ me, experts, trends }: SidebarRightProps) {
       className="hidden w-[340px] shrink-0 space-y-4 py-5 pr-4 xl:sticky xl:block xl:self-start"
     >
       <QuoteCard />
-      {me ? <ProfileCard me={me} /> : <JoinCard />}
+      {me ? (
+        <OwnProfileSlot username={me.username} own={<ProfileChecklist me={me} />}>
+          <ProfileCard me={me} />
+        </OwnProfileSlot>
+      ) : (
+        <JoinCard />
+      )}
       <TopExperts experts={experts} />
       <Trends trends={trends} />
       <PublishCta />

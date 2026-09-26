@@ -15,6 +15,9 @@ export type Viewer = {
   followers: number;
   following: number;
   unreadNotifications: number;
+  /** Para el checklist «Completa tu perfil». */
+  hasBio: boolean;
+  joinedCommunities: number;
 };
 
 /**
@@ -23,7 +26,7 @@ export type Viewer = {
  */
 export const getViewer = cache(async (): Promise<Viewer | null> => {
   if (!isSupabaseConfigured()) {
-    return { ...MOCK_ME, unreadNotifications: MOCK_UNREAD_NOTIFICATIONS };
+    return { ...MOCK_ME, unreadNotifications: MOCK_UNREAD_NOTIFICATIONS, hasBio: true, joinedCommunities: 2 };
   }
   const supabase = await createClient();
   const {
@@ -32,16 +35,17 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
   if (!user) return null;
 
   const head = { count: "exact", head: true } as const;
-  const [profile, posts, followers, following, unread] = await Promise.all([
+  const [profile, posts, followers, following, unread, joined] = await Promise.all([
     supabase
       .from("profiles")
-      .select("id, username, display_name, avatar_url, reputation, is_verified")
+      .select("id, username, display_name, avatar_url, reputation, is_verified, bio")
       .eq("id", user.id)
       .single(),
     supabase.from("posts").select("id", head).eq("author_id", user.id),
     supabase.from("follows").select("follower_id", head).eq("following_id", user.id),
     supabase.from("follows").select("following_id", head).eq("follower_id", user.id),
     supabase.from("notifications").select("id", head).eq("user_id", user.id).eq("read", false),
+    supabase.from("community_members").select("community_id", head).eq("user_id", user.id),
   ]);
   if (!profile.data) return null;
   const p = profile.data;
@@ -56,6 +60,8 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
     followers: followers.count ?? 0,
     following: following.count ?? 0,
     unreadNotifications: unread.count ?? 0,
+    hasBio: Boolean(p.bio?.trim()),
+    joinedCommunities: joined.count ?? 0,
   };
 });
 
